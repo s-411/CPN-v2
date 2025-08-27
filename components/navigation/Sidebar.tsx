@@ -10,7 +10,8 @@ import {
   PlusIcon, 
   TrophyIcon, 
   ShareIcon,
-  CreditCardIcon
+  CreditCardIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline';
 
 const navigationItems = [
@@ -18,6 +19,7 @@ const navigationItems = [
   { name: 'Girls', href: '/girls', icon: UsersIcon, active: true },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon, active: true },
   { name: 'Data Entry', href: '/data-entry', icon: PlusIcon, active: true },
+  { name: 'Data Vault', href: '/data-vault', icon: GlobeAltIcon, active: true },
   { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: true },
   { name: 'Share', href: '/share', icon: ShareIcon, active: false },
   { name: 'Subscription', href: '/subscription', icon: CreditCardIcon, active: false }
