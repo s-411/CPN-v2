@@ -3,166 +3,200 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
-CPN (Cost Per Nut) v2 is a Next.js 15.5 web application for tracking and analyzing personal relationship metrics. This is currently in the planning/design phase with documentation and design assets prepared but no code implementation yet.
+CPN (Cost Per Nut) v2 is a complete Next.js 15.5 web application for tracking and analyzing personal relationship metrics. This is a fully implemented MVP with React 19, TypeScript, and Tailwind CSS 4.1.
 
-## Tech Stack Requirements
-Based on `/docs/digitalocean-requirements.md`:
-- **Node.js**: 22.x (DigitalOcean default)
-- **Next.js**: 15.5 (with output: 'standalone' for deployment)
-- **Tailwind CSS**: 4.1 with @tailwindcss/postcss plugin
-- **Package Manager**: npm (bundled with Node 22)
-- **Deployment Target**: DigitalOcean App Platform (Post-MVP)
+## Development Commands
 
-## Project Setup Commands
-
-### Initial Setup (when implementing)
+### Local Development
 ```bash
-npm init -y
-npm install next@15.5.0 react@19.0.0 react-dom@19.0.0
-npm install tailwindcss@4.1.0 @tailwindcss/postcss@4.1.0 postcss@8.4.41
-npm install -D typescript@5.6.2
+npm run dev        # Start development server at http://localhost:3000 with hot reloading
+npm run build      # Build for production
+npm run start      # Start production server on ${PORT:-3000}
+npm run lint       # Run Next.js ESLint
+npm run type-check # Run TypeScript type checking without compilation
 ```
 
-### Local Development Setup (MVP)
-**IMPORTANT**: All MVP development is done locally with hot reloading for rapid iteration.
+**MVP Development Focus**: All development is done locally with hot reloading for rapid iteration. Keep browser open at `http://localhost:3000` - changes reflect immediately.
 
-```bash
-npm run dev      # Starts Next.js dev server at http://localhost:3000 with hot reloading
-```
+## Architecture Overview
 
-The development server provides:
-- **Hot Module Replacement (HMR)**: Changes appear instantly in browser
-- **Fast Refresh**: React component state preserved during edits
-- **Error Overlay**: Instant error feedback in browser
-- **Auto-compilation**: Automatic TypeScript/JSX compilation on save
+### State Management Architecture
+The application uses React Context with useReducer for centralized state management:
 
-Access the site at `http://localhost:3000` and keep the browser open while developing. Changes will reflect immediately without manual refresh.
+- **AppProvider** (`lib/context.tsx`): Wraps entire app in root layout
+- **State Management**: useReducer pattern with actions for CRUD operations
+- **Data Persistence**: localStorage with automatic sync via storage.ts
+- **Real-time Calculations**: Derived state automatically recalculated on data changes
+- **Custom Hooks**: `useGirls()`, `useDataEntries()`, `useGlobalStats()` for component access
 
-### Production Commands
-```bash
-npm run build    # Build for production (when ready)
-npm run start    # Start production server on ${PORT:-3000}
-```
+### Data Flow Pattern
+1. **Storage Layer** (`lib/storage.ts`): localStorage CRUD with UUID generation
+2. **Context Layer** (`lib/context.tsx`): Global state with real-time metric calculation
+3. **Component Layer**: Hooks provide reactive data access
+4. **UI Updates**: Automatic re-renders when underlying data changes
 
-### Build & Deploy (DigitalOcean - Post-MVP)
-- **Build Command**: `npm ci && npm run build`
-- **Run Command**: `npm start`
+### Key Architectural Patterns
+- **Modal-based UI**: AddGirlModal, EditGirlModal, EditEntryModal for consistent UX
+- **Calculated Metrics**: Real-time computation via `lib/calculations.ts`
+- **Responsive Navigation**: Sidebar (desktop) + MobileNav (mobile) with shared navigation items
+- **Form Patterns**: Controlled inputs with validation and error states
 
-## Core Application Structure
+## File Structure & Key Components
 
-### Pages & Features (from PRD)
-1. **Girls Page** (Dashboard) - Profile management hub
-2. **Add Data Page** - Individual data entry with real-time statistics
-3. **Overview Page** - Table view of all profiles with metrics
-4. **Analytics Page** - Charts and insights
-5. **Data Entry Page** - Quick general data entry
-6. **Settings & Profile** (future - greyed out in MVP)
+### Layout Structure
+- **Root Layout** (`app/layout.tsx`): AppProvider + Sidebar + MobileNav wrapper
+- **Navigation**: Responsive with active states and "coming soon" disabled items
+- **Pages**: Follow Next.js 15 App Router with dynamic routes for girls/[id]/add-data
 
-### Design System
-- **Typography**:
-  - Headers: National-2-Condensed-Bold (`font-heading`)
-  - Body: ESKlarheitGrotesk-Rg (`font-body`)
-- **Colors**: 
-  - Brand Yellow: `cpn-yellow` (rgb(242 246 97))
-  - Dark: `cpn-dark` (rgb(31 31 31))
-  - Dark2: `cpn-dark2` (rgb(42 42 42)) - Slightly lighter dark for elevated surfaces
-  - White: `cpn-white` (rgb(255 255 255))
-  - Gray: `cpn-gray` (rgb(171 171 171))
-- **Button Radius**: `rounded-cpn-button` (100px)
-
-### Data Models
-```javascript
-// Girl Profile
-{
-  id: string (UUID),
-  name: string,
-  age: number (18+ validation),
-  nationality: string,
-  rating: number (5.0-10.0, 0.5 increments),
-  createdAt: timestamp,
-  updatedAt: timestamp
+### Core Data Models
+```typescript
+// Girl Profile (lib/types.ts)
+interface Girl {
+  id: string;           // UUID
+  name: string;
+  age: number;          // 18+ validation
+  nationality: string;  // Now "Ethnicity (Optional)" in UI
+  rating: number;       // 5.0-10.0 in 0.5 increments, tile-based UI
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Data Entry
-{
-  id: string (UUID),
-  girlId: string (foreign key),
-  date: date,
-  amountSpent: number,
-  durationMinutes: number,
-  numberOfNuts: number,
-  createdAt: timestamp,
-  updatedAt: timestamp
+interface DataEntry {
+  id: string;           // UUID
+  girlId: string;       // Foreign key
+  date: Date;
+  amountSpent: number;
+  durationMinutes: number;
+  numberOfNuts: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Calculated metrics are derived in real-time
+interface GirlWithMetrics extends Girl {
+  metrics: CalculatedMetrics;
+  totalEntries: number;
 }
 ```
 
-### Key Calculations
+### Critical Business Logic
 - **Cost per Nut** = Total Spent / Total Nuts
-- **Time per Nut** = Total Time / Total Nuts  
+- **Time per Nut** = Total Time / Total Nuts (in minutes)
 - **Cost per Hour** = Total Spent / (Total Time in hours)
 
-## Configuration Files Setup
+## Design System Implementation
 
-### next.config.js
-```javascript
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: 'standalone',
-  reactStrictMode: true,
-  poweredByHeader: false,
-  compress: true,
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: '**.digitaloceanspaces.com' },
-      { protocol: 'https', hostname: '**.supabase.co' }
-    ]
-  }
-};
-module.exports = nextConfig;
-```
-
-### postcss.config.mjs (Tailwind v4)
-```javascript
-export default {
-  plugins: {
-    "@tailwindcss/postcss": {}
-  }
-}
-```
-
-### app/globals.css
+### Custom CSS Classes (app/globals.css)
 ```css
-@import "tailwindcss";
-/* Custom styles follow */
+.btn-cpn          # Primary yellow buttons with 100px border radius
+.input-cpn        # Form inputs with dark theme and yellow focus states
+.card-cpn         # Container cards with proper borders and padding
+.sidebar-item     # Navigation items with active yellow highlighting
+.mobile-nav-item  # Bottom navigation with active states
+.table-cpn        # Data tables with hover effects and proper borders
 ```
 
-## Environment Variables
-For local development (MVP), use a `.env.local` file:
-```
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-NODE_ENV=development
+### Brand Colors (CSS Variables)
+- `--color-cpn-yellow`: #f2f661 (Primary brand color)
+- `--color-cpn-dark`: #1f1f1f (Main background)
+- `--color-cpn-dark2`: #2a2a2a (Elevated surfaces, cards)
+- `--color-cpn-white`: #ffffff (Primary text)
+- `--color-cpn-gray`: #ababab (Secondary text, borders)
+
+### Typography
+- **Headings**: National2Condensed font (`font-heading`)
+- **Body**: ESKlarheit font (`font-body`)
+- **Font files**: Located in both `/design/fonts/` and `/public/fonts/`
+
+## Special Implementation Details
+
+### Hotness Rating System
+- **UI**: Tile-based selection (5.0-10.0 in 0.5 increments)
+- **Layout**: Two rows - 5.0-7.5 (6 tiles), 8.0-10.0 (5 tiles)
+- **Labels**: "5.0-6.0: Below Average" and "8.5-10.0: Exceptional"
+- **Default**: 6.0 rating for new profiles
+
+### Form Patterns
+- **Ethnicity Field**: Dropdown with "Prefer not to say" default, optional analytics
+- **Validation**: Real-time with error states
+- **Modals**: Consistent patterns across Add/Edit operations
+
+### Navigation Behavior
+- **Active States**: Yellow highlighting for current page
+- **Route Matching**: Special handling for `/girls` route (dashboard)
+- **Disabled Items**: Grayed out "coming soon" features (Leaderboards, Share, Subscription)
+
+## Next.js 15 Specific Notes
+
+### Params Handling
+Dynamic routes use `params` which is now a Promise in Next.js 15. Current implementation acknowledges the warning but remains functional:
+```typescript
+// TODO: Next.js 15 - params is now a Promise, will be fixed in future version
+const id = params.id; // Shows warning but app functions correctly
 ```
 
-For production deployment:
-```
-NEXT_PUBLIC_APP_URL=https://cpn.yourdomain.com
-NODE_ENV=production
-DATABASE_URL=<pooled connection string port 6543>
-```
+### App Router Structure
+- Uses new App Router with proper TypeScript integration
+- Server/Client components properly separated with 'use client' directives
+- Metadata API used in layout.tsx for SEO
 
-## Implementation Priorities
-1. **Phase 1**: Core data flow (Girls page, Add Data page, local storage)
-2. **Phase 2**: Views and analytics (Overview table, Analytics charts, Data Entry)
-3. **Phase 3**: Polish (animations, error handling, mobile optimization)
+## Development Roadmap Strategy
 
-## Key Development Guidelines
-- Use local storage for MVP (no backend/auth initially)
-- Real-time calculation updates (<100ms)
-- Mobile-first responsive design
-- Form validation on all inputs
-- Two-step confirmation for deletions
-- Keep calculator-like simplicity in UX
-- Prioritize fast local development with hot reloading
+**Current Strategy**: Complete local feature set before design perfection (see Roadmap.md)
 
-## Testing Approach
-When implementing tests, check for test scripts in package.json and follow the established patterns in the codebase.
+### Phase-Based Development Approach
+1. **Phase 1**: Complete Feature Set - Local Implementation (ROUGH but functional)
+2. **Phase 2**: Design System Perfection (with full system context)
+3. **Phase 3**: UX Flow Enhancement (across complete application)
+4. **Phases 4-8**: Advanced features, optimization, and Supabase migration
+
+### Subscription Tier Implementation
+- **Free Tier ("Boyfriend Mode")**: 1 girl max, dashboard access with strategic paywalls
+- **Premium Tier ("Player Mode")**: 50 girls max (hidden limit), full features, $1.99/week
+- **Lifetime Access**: Everything plus API access and priority support
+
+### Paywall Strategy
+- **Free users can navigate and click** throughout the app
+- **Strategic paywalls** appear when accessing premium features (Leaderboards, Analytics, etc.)
+- **Beautiful conversion-focused paywalls** with testimonials, feature lists, and upgrade CTAs
+- **Dashboard remains accessible** to demonstrate core value proposition
+
+### Development Workflow
+
+#### Phase 1 - Feature Implementation (Current)
+1. Build rough but complete versions of all features
+2. Focus on functionality over visual polish
+3. Create placeholder pages for: Leaderboards, Share, Profile, Settings, Billing, Data Vault
+4. Implement mock multi-user data for testing complete feature set
+
+#### Post-Phase 1 - System-Wide Polish
+1. Design system perfection with full feature context
+2. Component consistency across entire application
+3. UX flow enhancement with complete user journeys
+
+### Mock Data Strategy
+- Create realistic multi-user datasets for testing
+- Simulate leaderboard competition and rankings
+- Generate data vault aggregate statistics
+- Test all features with varied data scenarios
+
+### Data Management
+- All data persists to localStorage during local development
+- State changes trigger real-time metric recalculation
+- CRUD operations available via custom hooks
+- Supabase migration planned after complete local feature set
+
+## Tech Stack
+- **Framework**: Next.js 15.5 with App Router
+- **UI**: React 19.0.0 with TypeScript 5.6.2
+- **Styling**: Tailwind CSS 4.1.0 with custom theme
+- **Icons**: Heroicons 2.2.0
+- **Charts**: Recharts 3.1.2 (for analytics)
+- **Node**: 22.x (DigitalOcean deployment ready)
+
+## Configuration Files
+- **next.config.js**: Standalone output for deployment + image domains
+- **postcss.config.mjs**: Tailwind CSS 4.0 PostCSS plugin
+- **tsconfig.json**: Strict TypeScript with path aliases (@/)
+- **.gitignore**: Excludes node_modules, .next, .env.local
