@@ -11,7 +11,8 @@ import {
   TrophyIcon, 
   ShareIcon,
   CreditCardIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 
 const navigationItems = [
@@ -21,6 +22,7 @@ const navigationItems = [
   { name: 'Data Entry', href: '/data-entry', icon: PlusIcon, active: true },
   { name: 'Data Vault', href: '/data-vault', icon: GlobeAltIcon, active: true },
   { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: true },
+  { name: 'Settings', href: '/settings', icon: Cog6ToothIcon, active: true },
   { name: 'Share', href: '/share', icon: ShareIcon, active: false },
   { name: 'Subscription', href: '/subscription', icon: CreditCardIcon, active: false }
 ];
