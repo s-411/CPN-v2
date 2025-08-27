@@ -18,7 +18,7 @@ const navigationItems = [
   { name: 'Girls', href: '/girls', icon: UsersIcon, active: true },
   { name: 'Analytics', href: '/analytics', icon: ChartBarIcon, active: true },
   { name: 'Data Entry', href: '/data-entry', icon: PlusIcon, active: true },
-  { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: false },
+  { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: true },
   { name: 'Share', href: '/share', icon: ShareIcon, active: false },
   { name: 'Subscription', href: '/subscription', icon: CreditCardIcon, active: false }
 ];

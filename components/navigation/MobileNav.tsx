@@ -18,7 +18,7 @@ const navigationItems = [
   { name: 'Add', href: '/data-entry', icon: PlusIcon, active: true, isSpecial: true },
   { name: 'Share', href: '/share', icon: ShareIcon, active: false },
   { name: 'Girls', href: '/girls', icon: UsersIcon, active: true },
-  { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: false }
+  { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: true }
 ];
 
 export default function MobileNav() {
