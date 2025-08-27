@@ -17,6 +17,7 @@ import {
 } from 'recharts';
 import { useGirls, useDataEntries, useGlobalStats } from '@/lib/context';
 import { formatCurrency, formatTime, getMonthlyTrends } from '@/lib/calculations';
+import { AnalyticsShareButton } from '@/components/sharing/ShareButton';
 
 type TimeRange = '7' | '30' | '90' | 'all';
 
@@ -126,18 +127,24 @@ export default function AnalyticsPage() {
                 Insights and trends across all your data
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-cpn-gray">Time Range:</span>
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value as TimeRange)}
-                className="bg-cpn-dark border border-cpn-gray/30 text-cpn-white px-3 py-1 rounded-lg text-sm"
-              >
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-                <option value="90">Last 90 days</option>
-                <option value="all">All time</option>
-              </select>
+            <div className="flex items-center gap-4">
+              <AnalyticsShareButton 
+                data={{ globalStats, timeRange, filteredEntries }} 
+                className="mr-2"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-cpn-gray">Time Range:</span>
+                <select
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+                  className="bg-cpn-dark border border-cpn-gray/30 text-cpn-white px-3 py-1 rounded-lg text-sm"
+                >
+                  <option value="7">Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                  <option value="all">All time</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>

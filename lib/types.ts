@@ -215,3 +215,9 @@ export interface JoinGroupData {
   inviteToken: string;
   username: string;
 }
+
+// Overview page types
+export interface SortConfig {
+  field: string;
+  direction: 'asc' | 'desc';
+}

@@ -11,6 +11,7 @@ import {
 import { useGirls } from '@/lib/context';
 import { formatCurrency } from '@/lib/calculations';
 import { EthnicityOption, HairColorOption, DemographicStats } from '@/lib/types';
+import { ComparisonShareButton } from '@/components/sharing/ShareButton';
 
 type FilterState = {
   ethnicity: EthnicityOption | 'All';
@@ -179,14 +180,24 @@ export default function DataVaultPage() {
       <div className="border-b border-cpn-gray/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
-            <div className="flex items-center gap-3 mb-4">
-              <GlobeAltIcon className="w-8 h-8 text-cpn-yellow" />
-              <div>
-                <h1 className="text-3xl font-heading text-cpn-white">Data Vault</h1>
-                <p className="text-cpn-gray mt-1">
-                  Global insights and demographic trends from {filteredData?.totalUsers.toLocaleString()} anonymous users
-                </p>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <GlobeAltIcon className="w-8 h-8 text-cpn-yellow" />
+                <div>
+                  <h1 className="text-3xl font-heading text-cpn-white">Data Vault</h1>
+                  <p className="text-cpn-gray mt-1">
+                    Global insights and demographic trends from {filteredData?.totalUsers.toLocaleString()} anonymous users
+                  </p>
+                </div>
               </div>
+              <ComparisonShareButton 
+                data={{ 
+                  userComparison: filteredData?.userComparison, 
+                  globalStats: filteredData?.globalStats,
+                  filters 
+                }} 
+                className="ml-4"
+              />
             </div>
           </div>
         </div>
