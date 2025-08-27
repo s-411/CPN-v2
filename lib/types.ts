@@ -1,10 +1,42 @@
+// Demographic options for structured data
+export type EthnicityOption = 
+  | 'Asian'
+  | 'Black'
+  | 'Latina'
+  | 'White'
+  | 'Middle Eastern'
+  | 'Indian'
+  | 'Mixed'
+  | 'Native American'
+  | 'Pacific Islander'
+  | 'Other';
+
+export type HairColorOption =
+  | 'Blonde'
+  | 'Brunette' 
+  | 'Black'
+  | 'Red'
+  | 'Auburn'
+  | 'Gray/Silver'
+  | 'Dyed/Colorful'
+  | 'Other';
+
+export interface LocationData {
+  city?: string;
+  country?: string;
+}
+
 // Base girl profile type
 export interface Girl {
   id: string;
   name: string;
   age: number;
-  nationality: string;
+  nationality: string; // Keep existing field for backward compatibility
   rating: number; // 5.0-10.0, 0.5 increments
+  // New optional structured demographic fields
+  ethnicity?: EthnicityOption;
+  hairColor?: HairColorOption;
+  location?: LocationData;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +61,10 @@ export interface GirlFormData {
   age: string; // String for form input
   nationality: string;
   rating: number;
+  // Optional structured demographic fields for forms
+  ethnicity?: EthnicityOption;
+  hairColor?: HairColorOption;
+  location?: LocationData;
 }
 
 export interface DataEntryFormData {
@@ -70,4 +106,55 @@ export interface AnalyticsMetrics extends CalculatedMetrics {
   averageCostPerNut: number;
   averageTimePerNut: number;
   averageCostPerHour: number;
+}
+
+// Data Vault demographic analytics types
+export interface DemographicStats {
+  ethnicity: {
+    [key in EthnicityOption]: {
+      averageCostPerNut: number;
+      averageRating: number;
+      totalSpending: number;
+      userCount: number;
+    }
+  };
+  hairColor: {
+    [key in HairColorOption]: {
+      averageCostPerNut: number;
+      averageRating: number;
+      totalSpending: number;
+      userCount: number;
+    }
+  };
+  ratingTiers: {
+    [key: string]: { // "5.0-5.5", "6.0-6.5", etc.
+      averageCostPerNut: number;
+      totalSpending: number;
+      popularityPercentage: number;
+    }
+  };
+  locations: {
+    [country: string]: {
+      averageCostPerNut: number;
+      popularity: number;
+    }
+  };
+}
+
+export interface UserDemographicComparison {
+  ethnicityPreference: {
+    userFavorite?: EthnicityOption;
+    globalMostExpensive?: EthnicityOption;
+    userVsGlobalSpending: number; // percentage difference
+  };
+  ratingPreference: {
+    userAverageRating: number;
+    globalAverageRating: number;
+    userHighRatedPercentage: number; // % of 8+ rated girls
+  };
+  hairColorPreference: {
+    userFavorite?: HairColorOption;
+    globalMostExpensive?: HairColorOption;
+    userVsGlobalSpending: number;
+  };
 }
