@@ -182,68 +182,49 @@ export default function AnalyticsPage() {
         ) : (
           <div className="animate-fade-in space-y-8">
             {/* Analytics Reports Top Area - Metrics Tiles */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              {/* First Row */}
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Total Spent</h3>
-                <p className="text-2xl font-bold text-cpn-white">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-4">
+                <h3 className="text-base text-cpn-white font-heading mb-2">Total Spent</h3>
+                <p className="text-xl font-bold text-cpn-white">
                   {formatCurrency(globalStats.totalSpent)}
                 </p>
               </div>
 
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Total Nuts</h3>
-                <p className="text-2xl font-bold text-cpn-white">
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-4">
+                <h3 className="text-base text-cpn-white font-heading mb-2">Total Nuts</h3>
+                <p className="text-xl font-bold text-cpn-white">
                   {globalStats.totalNuts}
                 </p>
               </div>
 
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Active Profiles</h3>
-                <p className="text-2xl font-bold text-cpn-white">
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-4">
+                <h3 className="text-base text-cpn-white font-heading mb-2">Active Profiles</h3>
+                <p className="text-xl font-bold text-cpn-white">
                   {enhancedStats.activeProfilesInRange}
                 </p>
-                <p className="text-sm text-cpn-gray mt-1">
+                <p className="text-xs text-cpn-gray mt-1">
                   of {globalStats.totalGirls} total
                 </p>
               </div>
 
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Average Session Cost</h3>
-                <p className="text-2xl font-bold text-cpn-white">
-                  {formatCurrency(enhancedStats.averageSessionCost)}
-                </p>
-              </div>
-
-              {/* Second Row */}
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Average Cost Per Nut</h3>
-                <p className="text-2xl font-bold text-cpn-white">
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-4">
+                <h3 className="text-base text-cpn-white font-heading mb-2">Average Cost Per Nut</h3>
+                <p className="text-xl font-bold text-cpn-white">
                   {formatCurrency(globalStats.totalNuts > 0 ? globalStats.totalSpent / globalStats.totalNuts : 0)}
                 </p>
               </div>
 
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Total Time</h3>
-                <p className="text-2xl font-bold text-cpn-white">
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-4">
+                <h3 className="text-base text-cpn-white font-heading mb-2">Total Time</h3>
+                <p className="text-xl font-bold text-cpn-white">
                   {formatTime(globalStats.totalTime)}
                 </p>
               </div>
 
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Average Time Per Nut</h3>
-                <p className="text-2xl font-bold text-cpn-white">
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-4">
+                <h3 className="text-base text-cpn-white font-heading mb-2">Average Time Per Nut</h3>
+                <p className="text-xl font-bold text-cpn-white">
                   {globalStats.totalNuts > 0 ? Math.round(globalStats.totalTime / globalStats.totalNuts) : 0} mins
-                </p>
-              </div>
-
-              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Efficiency Score</h3>
-                <p className="text-2xl font-bold text-cpn-white">
-                  {formatCurrency(enhancedStats.efficiencyScore)}
-                </p>
-                <p className="text-sm text-cpn-gray mt-1">
-                  cost per nut
                 </p>
               </div>
             </div>

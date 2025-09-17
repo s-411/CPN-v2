@@ -155,7 +155,7 @@ export default function OverviewPage() {
                     </thead>
                     <tbody>
                       {sortedGirls.map((girl) => (
-                        <tr key={girl.id}>
+                        <tr key={girl.id} className="hover:bg-cpn-dark2 transition-colors duration-200">
                           <td>
                             <div>
                               <div className="font-medium text-cpn-white">{girl.name}</div>

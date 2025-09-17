@@ -149,7 +149,7 @@ export default function PreferencesPage() {
             <div className="flex items-center gap-4 mb-4">
               <Link
                 href="/settings"
-                className="p-2 text-cpn-gray hover:text-cpn-white transition-colors"
+                className="p-2 text-cpn-gray hover:text-cpn-white transition-colors cursor-pointer"
               >
                 <ArrowLeftIcon className="w-5 h-5" />
               </Link>
@@ -171,111 +171,6 @@ export default function PreferencesPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-fade-in space-y-8">
           
-          {/* Theme Customization */}
-          <div className="card-cpn">
-            <div className="flex items-center gap-3 mb-6">
-              <MoonIcon className="w-6 h-6 text-cpn-yellow" />
-              <h2 className="text-xl font-heading text-cpn-white">Theme Customization</h2>
-            </div>
-            
-            {/* Theme Selection */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-cpn-white mb-4">Choose Theme</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {themeOptions.map((theme) => (
-                  <button
-                    key={theme.id}
-                    onClick={() => updateThemeSettings({ theme: theme.id })}
-                    className={`p-4 rounded-lg border-2 transition-colors text-left ${
-                      themeSettings.theme === theme.id
-                        ? 'border-cpn-yellow bg-cpn-yellow/10'
-                        : 'border-cpn-gray/20 hover:border-cpn-gray/40'
-                    }`}
-                  >
-                    <div className={`w-full h-8 ${theme.preview} rounded mb-3`}></div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-cpn-white">{theme.name}</h4>
-                        <p className="text-sm text-cpn-gray">{theme.description}</p>
-                      </div>
-                      {themeSettings.theme === theme.id && (
-                        <CheckIcon className="w-5 h-5 text-cpn-yellow" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Accent Color Selection */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-cpn-white mb-4">Accent Color</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {accentColorOptions.map((color) => (
-                  <button
-                    key={color.id}
-                    onClick={() => updateThemeSettings({ accentColor: color.id })}
-                    className={`p-3 rounded-lg border-2 transition-colors ${
-                      themeSettings.accentColor === color.id
-                        ? 'border-cpn-yellow bg-cpn-yellow/10'
-                        : 'border-cpn-gray/20 hover:border-cpn-gray/40'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-6 h-6 ${color.color} rounded-full`}></div>
-                      <span className="text-cpn-white font-medium">{color.name}</span>
-                      {themeSettings.accentColor === color.id && (
-                        <CheckIcon className="w-4 h-4 text-cpn-yellow ml-auto" />
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Display Options */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-cpn-white">Display Options</h3>
-              
-              <div className="flex items-center justify-between p-4 bg-cpn-dark2/30 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-cpn-white">Compact Mode</h4>
-                  <p className="text-sm text-cpn-gray">Reduce spacing for more content</p>
-                </div>
-                <button
-                  onClick={() => updateThemeSettings({ compactMode: !themeSettings.compactMode })}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    themeSettings.compactMode ? 'bg-cpn-yellow' : 'bg-cpn-gray'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      themeSettings.compactMode ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-cpn-dark2/30 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-cpn-white">Animations</h4>
-                  <p className="text-sm text-cpn-gray">Enable smooth transitions and animations</p>
-                </div>
-                <button
-                  onClick={() => updateThemeSettings({ animationsEnabled: !themeSettings.animationsEnabled })}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    themeSettings.animationsEnabled ? 'bg-cpn-yellow' : 'bg-cpn-gray'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      themeSettings.animationsEnabled ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
 
           {/* Date & Time Formats */}
           <div className="card-cpn">
@@ -422,19 +317,13 @@ export default function PreferencesPage() {
             <button
               onClick={() => {
                 // Reset to defaults
-                updateThemeSettings({
-                  theme: 'dark',
-                  accentColor: 'yellow',
-                  compactMode: false,
-                  animationsEnabled: true
-                });
                 updateDateTimeSettings({
                   dateFormat: 'MM/DD/YYYY',
                   timeFormat: '12h',
                   weekStart: 'monday'
                 });
               }}
-              className="flex-1 py-3 px-4 text-cpn-gray border border-cpn-gray/30 rounded-lg hover:text-cpn-white hover:border-cpn-gray transition-all duration-200 text-center"
+              className="flex-1 py-3 px-4 text-cpn-gray border border-cpn-gray/30 rounded-lg hover:text-cpn-white hover:border-cpn-gray transition-all duration-200 text-center cursor-pointer"
             >
               Reset to Defaults
             </button>

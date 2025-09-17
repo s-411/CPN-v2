@@ -113,6 +113,7 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius-cpn);
     transition: opacity 0.2s;
+    cursor: pointer;
   }
   
   .btn-cpn:hover {
@@ -204,6 +205,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.5rem;
   color: var(--color-cpn-gray);
   transition: color 0.2s;
+  cursor: pointer;
 }
 
 .mobile-nav-item.active {

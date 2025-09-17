@@ -132,7 +132,7 @@ export default function GirlsPage() {
               <div className="card-cpn border-dashed border-cpn-yellow/30 hover:border-cpn-yellow transition-all duration-200">
                 <button
                   onClick={() => setIsAddModalOpen(true)}
-                  className="w-full h-full flex flex-col items-center justify-center py-8 text-cpn-gray hover:text-cpn-yellow transition-colors"
+                  className="w-full h-full flex flex-col items-center justify-center py-8 text-cpn-gray hover:text-cpn-yellow transition-colors cursor-pointer"
                 >
                   <div className="w-12 h-12 border-2 border-current rounded-full flex items-center justify-center mb-3">
                     <PlusIcon className="w-6 h-6" />

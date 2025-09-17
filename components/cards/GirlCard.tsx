@@ -15,7 +15,7 @@ export default function GirlCard({ girl, onEdit }: GirlCardProps) {
   const hasData = girl.totalEntries > 0;
 
   return (
-    <div className="card-cpn hover:border-cpn-yellow/30 transition-all duration-200 group">
+    <div className="card-cpn hover:border-cpn-yellow/30 hover:bg-cpn-dark2 transition-all duration-200 group">
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-2xl font-heading text-cpn-white group-hover:text-cpn-yellow transition-colors">
@@ -32,7 +32,7 @@ export default function GirlCard({ girl, onEdit }: GirlCardProps) {
         </div>
         <button
           onClick={() => onEdit(girl)}
-          className="text-cpn-gray hover:text-cpn-white transition-colors p-1"
+          className="text-cpn-gray hover:text-cpn-white transition-colors p-1 cursor-pointer"
           title="Edit profile"
         >
           <PencilIcon className="w-5 h-5" />

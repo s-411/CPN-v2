@@ -110,7 +110,7 @@ export default function EditEntryModal({ isOpen, onClose, entry }: EditEntryModa
           <h2 className="text-xl font-heading text-cpn-white">Edit Entry</h2>
           <button
             onClick={handleClose}
-            className="text-cpn-gray hover:text-cpn-white transition-colors p-1"
+            className="text-cpn-gray hover:text-cpn-white transition-colors p-1 cursor-pointer"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
