@@ -15,6 +15,7 @@ import { GirlWithMetrics, SortConfig } from '@/lib/types';
 import { formatCurrency, formatTime, formatRating, sortGirlsByField } from '@/lib/calculations';
 import EditGirlModal from '@/components/modals/EditGirlModal';
 import AddGirlModal from '@/components/modals/AddGirlModal';
+import DeleteWarningModal from '@/components/modals/DeleteWarningModal';
 
 export default function OverviewPage() {
   const { girlsWithMetrics, updateGirl, deleteGirl } = useGirls();
@@ -23,8 +24,8 @@ export default function OverviewPage() {
     field: 'createdAt',
     direction: 'asc'
   });
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [editingGirl, setEditingGirl] = useState<GirlWithMetrics | null>(null);
+  const [deletingGirl, setDeletingGirl] = useState<GirlWithMetrics | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleSort = (field: string) => {
@@ -34,14 +35,21 @@ export default function OverviewPage() {
     }));
   };
 
-  const handleDeleteClick = (girlId: string) => {
-    if (deleteConfirm === girlId) {
-      deleteGirl(girlId);
-      setDeleteConfirm(null);
-    } else {
-      setDeleteConfirm(girlId);
-      // Auto-cancel confirmation after 5 seconds
-      setTimeout(() => setDeleteConfirm(null), 5000);
+  const handleDeleteClick = (girl: GirlWithMetrics) => {
+    setDeletingGirl(girl);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deletingGirl) {
+      deleteGirl(deletingGirl.id);
+      setDeletingGirl(null);
+    }
+  };
+
+  const handleMakeInactive = () => {
+    if (deletingGirl) {
+      updateGirl(deletingGirl.id, { isActive: false });
+      setDeletingGirl(null);
     }
   };
 
@@ -228,13 +236,9 @@ export default function OverviewPage() {
                                 <PencilIcon className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() => handleDeleteClick(girl.id)}
-                                className={`transition-colors p-1 ${
-                                  deleteConfirm === girl.id
-                                    ? 'text-red-400 hover:text-red-300'
-                                    : 'text-cpn-gray hover:text-red-400'
-                                }`}
-                                title={deleteConfirm === girl.id ? 'Click again to confirm' : 'Delete girl'}
+                                onClick={() => handleDeleteClick(girl)}
+                                className="text-cpn-gray hover:text-red-400 transition-colors p-1 cursor-pointer"
+                                title="Delete girl"
                               >
                                 <TrashIcon className="w-4 h-4" />
                               </button>
@@ -333,13 +337,9 @@ export default function OverviewPage() {
                       <PencilIcon className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteClick(girl.id)}
-                      className={`p-2 rounded-lg transition-colors ${
-                        deleteConfirm === girl.id
-                          ? 'text-red-400 bg-red-500/10'
-                          : 'text-cpn-gray hover:text-red-400 hover:bg-red-500/10'
-                      }`}
-                      title={deleteConfirm === girl.id ? 'Confirm delete' : 'Delete'}
+                      onClick={() => handleDeleteClick(girl)}
+                      className="p-2 rounded-lg transition-colors text-cpn-gray hover:text-red-400 hover:bg-red-500/10 cursor-pointer"
+                      title="Delete"
                     >
                       <TrashIcon className="w-4 h-4" />
                     </button>
@@ -348,19 +348,6 @@ export default function OverviewPage() {
               ))}
             </div>
 
-            {deleteConfirm && (
-              <div className="fixed bottom-4 left-4 right-4 md:left-auto md:w-96 md:right-4 bg-red-500/10 border border-red-500/20 rounded-lg p-4 z-40">
-                <p className="text-sm text-red-400">
-                  Click the delete button again to permanently remove the girl and all associated data.
-                  <button
-                    onClick={() => setDeleteConfirm(null)}
-                    className="text-red-300 hover:text-red-200 ml-2 underline"
-                  >
-                    Cancel
-                  </button>
-                </p>
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -378,6 +365,15 @@ export default function OverviewPage() {
       <AddGirlModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
+      />
+
+      {/* Delete Warning Modal */}
+      <DeleteWarningModal
+        isOpen={!!deletingGirl}
+        onClose={() => setDeletingGirl(null)}
+        onConfirmDelete={handleConfirmDelete}
+        onMakeInactive={handleMakeInactive}
+        girl={deletingGirl}
       />
     </div>
   );
