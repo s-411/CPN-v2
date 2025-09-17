@@ -50,7 +50,7 @@ export class ShareService {
       metadata: {
         generatedAt: new Date(),
         privacy: options.privacy,
-        watermark: options.watermark || { enabled: true, type: 'text', position: 'corner', opacity: 0.7, includeDomain: true, includeTimestamps: true }
+        watermark: options.watermark || { enabled: true, type: 'text', position: 'corner', opacity: 0.7, includeDomain: true, includeTimestamp: true }
       }
     };
 
@@ -90,7 +90,7 @@ export class ShareService {
       metadata: {
         generatedAt: new Date(),
         privacy: options.privacy,
-        watermark: options.watermark || { enabled: true, type: 'text', position: 'corner', opacity: 0.7, includeDomain: true, includeTimestamps: true }
+        watermark: options.watermark || { enabled: true, type: 'text', position: 'corner', opacity: 0.7, includeDomain: true, includeTimestamp: true }
       }
     };
 
@@ -133,7 +133,7 @@ export class ShareService {
       metadata: {
         generatedAt: new Date(),
         privacy: options.privacy,
-        watermark: options.watermark || { enabled: true, type: 'text', position: 'corner', opacity: 0.7, includeDomain: true, includeTimestamps: true }
+        watermark: options.watermark || { enabled: true, type: 'text', position: 'corner', opacity: 0.7, includeDomain: true, includeTimestamp: true }
       }
     };
 

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { ShareService } from './ShareService';
-import { ShareableContent, ShareOptions, ShareHistoryEntry, SharePrivacySettings } from './types';
+import { ShareableContent, ShareOptions, ShareHistoryEntry, SharePrivacySettings, ShareFormat } from './types';
 import { DEFAULT_PRIVACY_SETTINGS } from './privacy';
 
 // Share state interface
@@ -19,7 +19,7 @@ interface ShareState {
   
   // User preferences
   preferences: {
-    defaultFormat: 'image' | 'json' | 'markdown' | 'html';
+    defaultFormat: ShareFormat;
     defaultPrivacy: SharePrivacySettings;
     autoWatermark: boolean;
     quickShareEnabled: boolean;
@@ -138,8 +138,8 @@ const ShareContext = createContext<{
   actions: {
     generateStatCard: (data: any, options: ShareOptions) => Promise<void>;
     generateComparisonReport: (data: any, options: ShareOptions) => Promise<void>;
-    shareViaClipboard: (format?: string) => Promise<boolean>;
-    shareViaDownload: (format?: string, filename?: string) => Promise<void>;
+    shareViaClipboard: (format?: ShareFormat) => Promise<boolean>;
+    shareViaDownload: (format?: ShareFormat, filename?: string) => Promise<void>;
     shareViaURL: () => Promise<string>;
     clearActiveShare: () => void;
     updatePreferences: (prefs: Partial<ShareState['preferences']>) => void;
@@ -221,13 +221,14 @@ export function ShareProvider({ children }: { children: ReactNode }) {
       }
     },
 
-    shareViaClipboard: async (format = state.preferences.defaultFormat) => {
+    shareViaClipboard: async (format?: ShareFormat) => {
       if (!state.activeShare.content) return false;
-      
+
       try {
+        const formatToUse = format || state.preferences.defaultFormat;
         const success = await shareService.shareViaClipboard(
-          state.activeShare.content, 
-          format as any
+          state.activeShare.content,
+          formatToUse
         );
         if (success) {
           refreshHistory();
@@ -239,13 +240,14 @@ export function ShareProvider({ children }: { children: ReactNode }) {
       }
     },
 
-    shareViaDownload: async (format = state.preferences.defaultFormat, filename?: string) => {
+    shareViaDownload: async (format?: ShareFormat, filename?: string) => {
       if (!state.activeShare.content) return;
-      
+
       try {
+        const formatToUse = format || state.preferences.defaultFormat;
         await shareService.shareViaDownload(
           state.activeShare.content,
-          format as any,
+          formatToUse,
           filename
         );
         refreshHistory();
