@@ -21,6 +21,7 @@ export default function EditGirlModal({ isOpen, onClose, girl }: EditGirlModalPr
     age: '',
     nationality: '',
     rating: 5.0,
+    isActive: true,
     ethnicity: undefined,
     hairColor: undefined,
     location: undefined
@@ -34,6 +35,7 @@ export default function EditGirlModal({ isOpen, onClose, girl }: EditGirlModalPr
         age: girl.age.toString(),
         nationality: girl.nationality,
         rating: girl.rating,
+        isActive: girl.isActive ?? true, // Default to true for backward compatibility
         ethnicity: girl.ethnicity,
         hairColor: girl.hairColor,
         location: girl.location
@@ -76,6 +78,7 @@ export default function EditGirlModal({ isOpen, onClose, girl }: EditGirlModalPr
         age: parseInt(formData.age),
         nationality: formData.nationality.trim(),
         rating: typeof formData.rating === 'number' ? formData.rating : parseFloat(formData.rating.toString()),
+        isActive: formData.isActive ?? true,
         ethnicity: formData.ethnicity,
         hairColor: formData.hairColor,
         location: formData.location && (formData.location.city || formData.location.country)

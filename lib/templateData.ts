@@ -18,6 +18,7 @@ export const TEMPLATE_GIRLS: Girl[] = [
     age: 26,
     nationality: 'American',
     rating: 8.5,
+    isActive: true,
     createdAt: new Date('2024-01-15'),
     updatedAt: new Date('2024-03-10')
   },
@@ -27,6 +28,7 @@ export const TEMPLATE_GIRLS: Girl[] = [
     age: 24,
     nationality: 'British',
     rating: 7.0,
+    isActive: true,
     createdAt: new Date('2024-02-01'),
     updatedAt: new Date('2024-03-15')
   },
@@ -36,6 +38,7 @@ export const TEMPLATE_GIRLS: Girl[] = [
     age: 28,
     nationality: 'Spanish',
     rating: 9.0,
+    isActive: true,
     createdAt: new Date('2024-02-20'),
     updatedAt: new Date('2024-03-01')
   },
@@ -45,6 +48,7 @@ export const TEMPLATE_GIRLS: Girl[] = [
     age: 23,
     nationality: 'Canadian',
     rating: 6.5,
+    isActive: false, // Make one inactive for demo
     createdAt: new Date('2024-03-01'),
     updatedAt: new Date('2024-03-01')
   },
@@ -54,6 +58,7 @@ export const TEMPLATE_GIRLS: Girl[] = [
     age: 27,
     nationality: 'Italian',
     rating: 8.0,
+    isActive: true,
     createdAt: new Date('2024-03-05'),
     updatedAt: new Date('2024-03-12')
   }

@@ -22,6 +22,7 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
     age: '',
     nationality: '',
     rating: 6.0,
+    isActive: true, // Default to active
     ethnicity: undefined,
     hairColor: undefined,
     location: undefined
@@ -62,6 +63,7 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
         age: parseInt(formData.age),
         nationality: formData.nationality.trim(),
         rating: typeof formData.rating === 'number' ? formData.rating : parseFloat(formData.rating.toString()),
+        isActive: formData.isActive ?? true, // Default to true if undefined
         ethnicity: formData.ethnicity,
         hairColor: formData.hairColor,
         location: formData.location && (formData.location.city || formData.location.country)
@@ -75,6 +77,7 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
         age: '',
         nationality: '',
         rating: 6.0,
+        isActive: true,
         ethnicity: undefined,
         hairColor: undefined,
         location: undefined

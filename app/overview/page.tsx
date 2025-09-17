@@ -17,10 +17,10 @@ import EditGirlModal from '@/components/modals/EditGirlModal';
 import AddGirlModal from '@/components/modals/AddGirlModal';
 
 export default function OverviewPage() {
-  const { girlsWithMetrics, deleteGirl } = useGirls();
+  const { girlsWithMetrics, updateGirl, deleteGirl } = useGirls();
   const { getEntriesByGirlId } = useDataEntries();
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    field: 'name',
+    field: 'createdAt',
     direction: 'asc'
   });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -128,6 +128,9 @@ export default function OverviewPage() {
                           <SortButton field="name">Name</SortButton>
                         </th>
                         <th>
+                          <SortButton field="isActive">Status</SortButton>
+                        </th>
+                        <th>
                           <SortButton field="rating">Rating</SortButton>
                         </th>
                         <th>
@@ -163,6 +166,22 @@ export default function OverviewPage() {
                                 {girl.age} • {girl.nationality}
                               </div>
                             </div>
+                          </td>
+                          <td>
+                            {/* Status Toggle */}
+                            <button
+                              onClick={() => updateGirl(girl.id, { isActive: !girl.isActive })}
+                              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${
+                                girl.isActive ? 'bg-green-500' : 'bg-cpn-gray'
+                              }`}
+                              title={girl.isActive ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}
+                            >
+                              <span
+                                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                                  girl.isActive ? 'translate-x-5' : 'translate-x-1'
+                                }`}
+                              />
+                            </button>
                           </td>
                           <td>
                             <span className="text-cpn-yellow font-medium">

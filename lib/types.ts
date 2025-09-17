@@ -33,6 +33,7 @@ export interface Girl {
   age: number;
   nationality: string; // Keep existing field for backward compatibility
   rating: number; // 5.0-10.0, 0.5 increments
+  isActive: boolean; // Active/inactive status for filtering
   // New optional structured demographic fields
   ethnicity?: EthnicityOption;
   hairColor?: HairColorOption;
@@ -61,6 +62,7 @@ export interface GirlFormData {
   age: string; // String for form input
   nationality: string;
   rating: number | string; // Allow both for validation errors
+  isActive?: boolean; // Optional for forms, defaults to true
   // Optional structured demographic fields for forms
   ethnicity?: EthnicityOption;
   hairColor?: HairColorOption;

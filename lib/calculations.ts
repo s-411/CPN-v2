@@ -40,16 +40,25 @@ export function createGirlWithMetrics(girl: Girl, entries: DataEntry[]): GirlWit
 
 export function calculateGlobalStats(girls: Girl[], allEntries: DataEntry[]): GlobalStats {
   const totalGirls = girls.length;
-  const activeGirls = girls.filter(girl => 
-    allEntries.some(entry => entry.girlId === girl.id)
-  ).length;
-
-  const totalSpent = allEntries.reduce((sum, entry) => sum + entry.amountSpent, 0);
-  const totalNuts = allEntries.reduce((sum, entry) => sum + entry.numberOfNuts, 0);
-  const totalTime = allEntries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
   
-  const averageRating = girls.length > 0 
-    ? girls.reduce((sum, girl) => sum + girl.rating, 0) / girls.length 
+  // Filter to only include active girls
+  const activeGirlsWithData = girls.filter(girl => 
+    (girl.isActive ?? true) && allEntries.some(entry => entry.girlId === girl.id)
+  );
+  const activeGirls = activeGirlsWithData.length;
+
+  // Filter entries to only include data from active girls
+  const activeGirlIds = new Set(girls.filter(girl => girl.isActive ?? true).map(girl => girl.id));
+  const activeEntries = allEntries.filter(entry => activeGirlIds.has(entry.girlId));
+
+  const totalSpent = activeEntries.reduce((sum, entry) => sum + entry.amountSpent, 0);
+  const totalNuts = activeEntries.reduce((sum, entry) => sum + entry.numberOfNuts, 0);
+  const totalTime = activeEntries.reduce((sum, entry) => sum + entry.durationMinutes, 0);
+  
+  // Only include active girls in average rating calculation
+  const activeGirlsList = girls.filter(girl => girl.isActive ?? true);
+  const averageRating = activeGirlsList.length > 0 
+    ? activeGirlsList.reduce((sum, girl) => sum + girl.rating, 0) / activeGirlsList.length 
     : 0;
 
   return {
@@ -138,7 +147,7 @@ export function sortGirlsByField<T extends GirlWithMetrics>(
 // Data analysis functions
 export function getTopPerformers(girls: GirlWithMetrics[], metric: keyof CalculatedMetrics, count: number = 5) {
   return [...girls]
-    .filter(girl => girl.totalEntries > 0)
+    .filter(girl => girl.totalEntries > 0 && (girl.isActive ?? true))
     .sort((a, b) => {
       const aValue = a.metrics[metric];
       const bValue = b.metrics[metric];
@@ -201,7 +210,7 @@ export function getCostEfficiencyTrends(entries: DataEntry[]) {
 }
 
 export function getSpendingDistribution(girls: GirlWithMetrics[]) {
-  const activeGirls = girls.filter(girl => girl.totalEntries > 0);
+  const activeGirls = girls.filter(girl => girl.totalEntries > 0 && (girl.isActive ?? true));
   const totalSpent = activeGirls.reduce((sum, girl) => sum + girl.metrics.totalSpent, 0);
 
   return activeGirls.map(girl => ({
@@ -213,7 +222,7 @@ export function getSpendingDistribution(girls: GirlWithMetrics[]) {
 
 export function getEfficiencyRatingCorrelation(girls: GirlWithMetrics[]) {
   return girls
-    .filter(girl => girl.totalEntries > 0)
+    .filter(girl => girl.totalEntries > 0 && (girl.isActive ?? true))
     .map(girl => ({
       name: girl.name,
       rating: girl.rating,
@@ -225,7 +234,7 @@ export function getEfficiencyRatingCorrelation(girls: GirlWithMetrics[]) {
 
 export function getROIRanking(girls: GirlWithMetrics[]) {
   return girls
-    .filter(girl => girl.totalEntries > 0)
+    .filter(girl => girl.totalEntries > 0 && (girl.isActive ?? true))
     .map(girl => {
       const nutsPerDollar = girl.metrics.totalSpent > 0 ? girl.metrics.totalNuts / girl.metrics.totalSpent : 0;
       const nutsPerHour = girl.metrics.totalTime > 0 ? (girl.metrics.totalNuts / girl.metrics.totalTime) * 60 : 0;
@@ -248,7 +257,7 @@ export function getROIRanking(girls: GirlWithMetrics[]) {
 export function getEnhancedGlobalStats(girls: Girl[], allEntries: DataEntry[], timeRangeEntries: DataEntry[]) {
   const baseStats = calculateGlobalStats(girls, allEntries);
   const filteredGirls = girls.filter(girl =>
-    timeRangeEntries.some(entry => entry.girlId === girl.id)
+    (girl.isActive ?? true) && timeRangeEntries.some(entry => entry.girlId === girl.id)
   );
 
   const averageSessionCost = timeRangeEntries.length > 0
