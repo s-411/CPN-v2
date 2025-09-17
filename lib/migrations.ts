@@ -48,8 +48,8 @@ export function migrateGirlProfiles(): {
     
     girls.forEach(girl => {
       try {
-        // Skip if already migrated (has ethnicity field)
-        if (girl.ethnicity !== undefined) {
+        // Skip if already migrated (has ethnicity field AND isActive field)
+        if (girl.ethnicity !== undefined && girl.isActive !== undefined) {
           results.skipped++;
           return;
         }
@@ -80,6 +80,7 @@ export function migrateGirlProfiles(): {
           ethnicity,
           hairColor: undefined, // User will need to fill this in
           location: undefined,  // User will need to fill this in
+          isActive: girl.isActive ?? true, // Default to active for existing girls
           updatedAt: new Date()
         };
 
@@ -87,7 +88,8 @@ export function migrateGirlProfiles(): {
         girlsStorage.update(girl.id, {
           ethnicity: updatedGirl.ethnicity,
           hairColor: updatedGirl.hairColor,
-          location: updatedGirl.location
+          location: updatedGirl.location,
+          isActive: updatedGirl.isActive
         });
 
         results.migrated++;
@@ -109,7 +111,7 @@ export function migrateGirlProfiles(): {
 export function needsMigration(): boolean {
   try {
     const girls = girlsStorage.getAll();
-    return girls.some(girl => girl.ethnicity === undefined);
+    return girls.some(girl => girl.ethnicity === undefined || girl.isActive === undefined);
   } catch (error) {
     console.error('Error checking migration status:', error);
     return false;
@@ -126,8 +128,8 @@ export function getMigrationStats(): {
 } {
   try {
     const girls = girlsStorage.getAll();
-    const needsMigration = girls.filter(girl => girl.ethnicity === undefined);
-    const alreadyMigrated = girls.filter(girl => girl.ethnicity !== undefined);
+    const needsMigration = girls.filter(girl => girl.ethnicity === undefined || girl.isActive === undefined);
+    const alreadyMigrated = girls.filter(girl => girl.ethnicity !== undefined && girl.isActive !== undefined);
 
     return {
       total: girls.length,
