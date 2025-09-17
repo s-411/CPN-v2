@@ -19,7 +19,7 @@ import { useGirls, useDataEntries, useGlobalStats } from '@/lib/context';
 import { formatCurrency, formatTime, formatRating } from '@/lib/calculations';
 import AddGirlModal from '@/components/modals/AddGirlModal';
 
-export default function DashboardPage() {
+export default function DashboardRevertPage() {
   const { girlsWithMetrics } = useGirls();
   const { dataEntries } = useDataEntries();
   const { globalStats, isLoading } = useGlobalStats();
@@ -70,9 +70,9 @@ export default function DashboardPage() {
                 <ChartBarIcon className="w-6 h-6 text-cpn-gray" />
               </div>
               <div>
-                <h1 className="text-3xl font-heading text-cpn-white">Dashboard</h1>
+                <h1 className="text-3xl font-heading text-cpn-white">Dashboard (Original Style)</h1>
                 <p className="text-cpn-gray mt-1">
-                  Your performance insights and recent activity
+                  Your performance insights and recent activity - original icon styling
                 </p>
               </div>
             </div>
