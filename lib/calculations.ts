@@ -167,11 +167,11 @@ export function getMonthlyTrends(entries: DataEntry[]) {
   entries.forEach(entry => {
     const date = new Date(entry.date);
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    
+
     if (!monthlyData.has(monthKey)) {
       monthlyData.set(monthKey, { spent: 0, nuts: 0, time: 0, entries: 0 });
     }
-    
+
     const monthData = monthlyData.get(monthKey)!;
     monthData.spent += entry.amountSpent;
     monthData.nuts += entry.numberOfNuts;
@@ -187,4 +187,83 @@ export function getMonthlyTrends(entries: DataEntry[]) {
       costPerHour: data.time > 0 ? (data.spent / data.time) * 60 : 0
     }))
     .sort((a, b) => a.month.localeCompare(b.month));
+}
+
+// New analytics functions for enhanced charts
+export function getCostEfficiencyTrends(entries: DataEntry[]) {
+  const monthlyData = getMonthlyTrends(entries);
+  return monthlyData.map(data => ({
+    month: data.month,
+    costPerNut: Math.round(data.costPerNut * 100) / 100,
+    averageSpending: Math.round(data.spent / data.entries * 100) / 100,
+    entries: data.entries
+  }));
+}
+
+export function getSpendingDistribution(girls: GirlWithMetrics[]) {
+  const activeGirls = girls.filter(girl => girl.totalEntries > 0);
+  const totalSpent = activeGirls.reduce((sum, girl) => sum + girl.metrics.totalSpent, 0);
+
+  return activeGirls.map(girl => ({
+    name: girl.name,
+    value: girl.metrics.totalSpent,
+    percentage: totalSpent > 0 ? (girl.metrics.totalSpent / totalSpent) * 100 : 0
+  })).sort((a, b) => b.value - a.value);
+}
+
+export function getEfficiencyRatingCorrelation(girls: GirlWithMetrics[]) {
+  return girls
+    .filter(girl => girl.totalEntries > 0)
+    .map(girl => ({
+      name: girl.name,
+      rating: girl.rating,
+      costPerNut: girl.metrics.costPerNut,
+      nutsPerHour: girl.metrics.totalTime > 0 ? (girl.metrics.totalNuts / girl.metrics.totalTime) * 60 : 0,
+      totalSpent: girl.metrics.totalSpent
+    }));
+}
+
+export function getROIRanking(girls: GirlWithMetrics[]) {
+  return girls
+    .filter(girl => girl.totalEntries > 0)
+    .map(girl => {
+      const nutsPerDollar = girl.metrics.totalSpent > 0 ? girl.metrics.totalNuts / girl.metrics.totalSpent : 0;
+      const nutsPerHour = girl.metrics.totalTime > 0 ? (girl.metrics.totalNuts / girl.metrics.totalTime) * 60 : 0;
+      const efficiencyScore = (nutsPerDollar * 100) + (nutsPerHour * 10) + girl.rating;
+
+      return {
+        name: girl.name,
+        rating: girl.rating,
+        costPerNut: girl.metrics.costPerNut,
+        nutsPerDollar: Math.round(nutsPerDollar * 1000) / 1000,
+        nutsPerHour: Math.round(nutsPerHour * 100) / 100,
+        efficiencyScore: Math.round(efficiencyScore * 100) / 100,
+        totalNuts: girl.metrics.totalNuts,
+        totalSpent: girl.metrics.totalSpent
+      };
+    })
+    .sort((a, b) => b.efficiencyScore - a.efficiencyScore);
+}
+
+export function getEnhancedGlobalStats(girls: Girl[], allEntries: DataEntry[], timeRangeEntries: DataEntry[]) {
+  const baseStats = calculateGlobalStats(girls, allEntries);
+  const filteredGirls = girls.filter(girl =>
+    timeRangeEntries.some(entry => entry.girlId === girl.id)
+  );
+
+  const averageSessionCost = timeRangeEntries.length > 0
+    ? timeRangeEntries.reduce((sum, entry) => sum + entry.amountSpent, 0) / timeRangeEntries.length
+    : 0;
+
+  const totalTimeRangeSpent = timeRangeEntries.reduce((sum, entry) => sum + entry.amountSpent, 0);
+  const totalTimeRangeNuts = timeRangeEntries.reduce((sum, entry) => sum + entry.numberOfNuts, 0);
+  const efficiencyScore = totalTimeRangeNuts > 0 ? totalTimeRangeSpent / totalTimeRangeNuts : 0;
+
+  return {
+    ...baseStats,
+    activeProfilesInRange: filteredGirls.length,
+    averageSessionCost: Math.round(averageSessionCost * 100) / 100,
+    efficiencyScore: Math.round(efficiencyScore * 100) / 100,
+    totalSessionsInRange: timeRangeEntries.length
+  };
 }

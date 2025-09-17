@@ -13,10 +13,21 @@ import {
   Line,
   PieChart,
   Pie,
-  Cell
+  Cell,
+  ScatterChart,
+  Scatter
 } from 'recharts';
 import { useGirls, useDataEntries, useGlobalStats } from '@/lib/context';
-import { formatCurrency, formatTime, getMonthlyTrends } from '@/lib/calculations';
+import {
+  formatCurrency,
+  formatTime,
+  getMonthlyTrends,
+  getCostEfficiencyTrends,
+  getSpendingDistribution,
+  getEfficiencyRatingCorrelation,
+  getROIRanking,
+  getEnhancedGlobalStats
+} from '@/lib/calculations';
 import { AnalyticsShareButton } from '@/components/sharing/ShareButton';
 import { getGirlColors, getColorByGirlName } from '@/lib/colors';
 
@@ -46,6 +57,13 @@ export default function AnalyticsPage() {
 
   // Get consistent colors for all girls
   const girlColorMap = getGirlColors(activeGirls.map(girl => girl.id));
+
+  // New data for enhanced charts
+  const costEfficiencyTrends = getCostEfficiencyTrends(filteredEntries);
+  const spendingDistribution = getSpendingDistribution(activeGirls);
+  const efficiencyRatingData = getEfficiencyRatingCorrelation(activeGirls);
+  const roiRanking = getROIRanking(activeGirls);
+  const enhancedStats = getEnhancedGlobalStats(girlsWithMetrics, dataEntries, filteredEntries);
 
   // Data for Total Spent per Girl chart
   const spentPerGirlData = activeGirls
@@ -167,48 +185,68 @@ export default function AnalyticsPage() {
         ) : (
           <div className="animate-fade-in space-y-8">
             {/* Analytics Reports Top Area - Metrics Tiles */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {/* Top Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              {/* First Row */}
               <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
                 <h3 className="text-lg text-cpn-white font-heading mb-4">Total Spent</h3>
-                <p className="text-5xl font-bold text-cpn-white">
+                <p className="text-2xl font-bold text-cpn-white">
                   {formatCurrency(globalStats.totalSpent)}
                 </p>
               </div>
-              
+
               <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
                 <h3 className="text-lg text-cpn-white font-heading mb-4">Total Nuts</h3>
-                <p className="text-5xl font-bold text-cpn-white">
+                <p className="text-2xl font-bold text-cpn-white">
                   {globalStats.totalNuts}
                 </p>
               </div>
-              
+
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
+                <h3 className="text-lg text-cpn-white font-heading mb-4">Active Profiles</h3>
+                <p className="text-2xl font-bold text-cpn-white">
+                  {enhancedStats.activeProfilesInRange}
+                </p>
+                <p className="text-sm text-cpn-gray mt-1">
+                  of {globalStats.totalGirls} total
+                </p>
+              </div>
+
+              <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
+                <h3 className="text-lg text-cpn-white font-heading mb-4">Average Session Cost</h3>
+                <p className="text-2xl font-bold text-cpn-white">
+                  {formatCurrency(enhancedStats.averageSessionCost)}
+                </p>
+              </div>
+
+              {/* Second Row */}
               <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
                 <h3 className="text-lg text-cpn-white font-heading mb-4">Average Cost Per Nut</h3>
-                <p className="text-5xl font-bold text-cpn-white">
+                <p className="text-2xl font-bold text-cpn-white">
                   {formatCurrency(globalStats.totalNuts > 0 ? globalStats.totalSpent / globalStats.totalNuts : 0)}
                 </p>
               </div>
-              
-              {/* Bottom Row */}
+
               <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
                 <h3 className="text-lg text-cpn-white font-heading mb-4">Total Time</h3>
-                <p className="text-5xl font-bold text-cpn-white">
+                <p className="text-2xl font-bold text-cpn-white">
                   {formatTime(globalStats.totalTime)}
                 </p>
               </div>
-              
+
               <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
                 <h3 className="text-lg text-cpn-white font-heading mb-4">Average Time Per Nut</h3>
-                <p className="text-5xl font-bold text-cpn-white">
+                <p className="text-2xl font-bold text-cpn-white">
                   {globalStats.totalNuts > 0 ? Math.round(globalStats.totalTime / globalStats.totalNuts) : 0} mins
                 </p>
               </div>
-              
+
               <div className="bg-cpn-dark2 border border-cpn-gray/20 rounded-lg p-6">
-                <h3 className="text-lg text-cpn-white font-heading mb-4">Average Cost Per Hour</h3>
-                <p className="text-5xl font-bold text-cpn-white">
-                  {formatCurrency(globalStats.totalTime > 0 ? globalStats.totalSpent / (globalStats.totalTime / 60) : 0)}
+                <h3 className="text-lg text-cpn-white font-heading mb-4">Efficiency Score</h3>
+                <p className="text-2xl font-bold text-cpn-white">
+                  {formatCurrency(enhancedStats.efficiencyScore)}
+                </p>
+                <p className="text-sm text-cpn-gray mt-1">
+                  cost per nut
                 </p>
               </div>
             </div>
@@ -404,21 +442,21 @@ export default function AnalyticsPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={monthlyTrends}>
                         <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--cpn-gray) / 0.2)" />
-                        <XAxis 
-                          dataKey="month" 
+                        <XAxis
+                          dataKey="month"
                           tick={{ fill: '#ababab' }}
                           axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         />
-                        <YAxis 
+                        <YAxis
                           tick={{ fill: '#ababab' }}
                           axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                           tickFormatter={(value) => `$${value}`}
                         />
                         <Tooltip content={<CustomTooltip />} />
-                        <Line 
-                          type="monotone" 
-                          dataKey="spent" 
-                          stroke="rgb(var(--cpn-yellow))" 
+                        <Line
+                          type="monotone"
+                          dataKey="spent"
+                          stroke="rgb(var(--cpn-yellow))"
                           strokeWidth={3}
                           dot={{ fill: 'rgb(var(--cpn-yellow))', strokeWidth: 2, r: 4 }}
                         />
@@ -427,7 +465,176 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               )}
+
+              {/* Cost Efficiency Trends */}
+              {costEfficiencyTrends.length > 1 && (
+                <div className="card-cpn">
+                  <h3 className="text-lg font-heading text-cpn-white mb-4">
+                    Cost Efficiency Trends
+                  </h3>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={costEfficiencyTrends}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--cpn-gray) / 0.2)" />
+                        <XAxis
+                          dataKey="month"
+                          tick={{ fill: '#ababab' }}
+                          axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
+                        />
+                        <YAxis
+                          tick={{ fill: '#ababab' }}
+                          axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
+                          tickFormatter={(value) => `$${value.toFixed(2)}`}
+                        />
+                        <Tooltip content={<CustomTooltip />} cursor={{ fill: 'transparent' }} />
+                        <Line
+                          type="monotone"
+                          dataKey="costPerNut"
+                          stroke="#ff6b6b"
+                          strokeWidth={3}
+                          dot={{ fill: '#ff6b6b', strokeWidth: 2, r: 4 }}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Spending Distribution */}
+              {spendingDistribution.length > 0 && (
+                <div className="card-cpn">
+                  <h3 className="text-lg font-heading text-cpn-white mb-4">
+                    Spending Distribution
+                  </h3>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={spendingDistribution}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          dataKey="value"
+                          label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
+                          labelLine={false}
+                        >
+                          {spendingDistribution.map((entry, index) => {
+                            const girl = activeGirls.find(g => g.name === entry.name);
+                            const color = girl ? girlColorMap[girl.id] : `#${Math.floor(Math.random()*16777215).toString(16)}`;
+                            return <Cell key={`cell-${index}`} fill={color} />;
+                          })}
+                        </Pie>
+                        <Tooltip
+                          formatter={(value: any) => [formatCurrency(value), "Amount"]}
+                          contentStyle={{
+                            backgroundColor: 'var(--color-cpn-dark)',
+                            border: '1px solid rgb(var(--cpn-gray) / 0.2)',
+                            borderRadius: '8px',
+                            color: 'var(--color-cpn-white)'
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Efficiency vs Rating Scatter Plot */}
+              {efficiencyRatingData.length > 0 && (
+                <div className="card-cpn">
+                  <h3 className="text-lg font-heading text-cpn-white mb-4">
+                    Efficiency vs Rating Analysis
+                  </h3>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ScatterChart data={efficiencyRatingData}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--cpn-gray) / 0.2)" />
+                        <XAxis
+                          type="number"
+                          dataKey="rating"
+                          domain={[5, 10]}
+                          tick={{ fill: '#ababab' }}
+                          axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
+                          label={{ value: 'Rating', position: 'insideBottom', offset: -5, fill: '#ababab' }}
+                        />
+                        <YAxis
+                          type="number"
+                          dataKey="costPerNut"
+                          tick={{ fill: '#ababab' }}
+                          axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
+                          tickFormatter={(value) => `$${value.toFixed(2)}`}
+                          label={{ value: 'Cost per Nut', angle: -90, position: 'insideLeft', fill: '#ababab' }}
+                        />
+                        <Tooltip
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-cpn-dark border border-cpn-gray/20 rounded-lg p-3 shadow-lg">
+                                  <p className="text-cpn-white font-medium">{data.name}</p>
+                                  <p className="text-sm text-cpn-gray">
+                                    Rating: {data.rating}/10
+                                  </p>
+                                  <p className="text-sm text-cpn-gray">
+                                    Cost per Nut: {formatCurrency(data.costPerNut)}
+                                  </p>
+                                  <p className="text-sm text-cpn-gray">
+                                    Nuts/Hour: {data.nutsPerHour.toFixed(2)}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                        <Scatter dataKey="costPerNut" fill="#8884d8">
+                          {efficiencyRatingData.map((entry, index) => {
+                            const girl = activeGirls.find(g => g.name === entry.name);
+                            const color = girl ? girlColorMap[girl.id] : '#8884d8';
+                            return <Cell key={`cell-${index}`} fill={color} />;
+                          })}
+                        </Scatter>
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* ROI Ranking Table */}
+            {roiRanking.length > 0 && (
+              <div className="card-cpn">
+                <h3 className="text-lg font-heading text-cpn-white mb-4">
+                  ROI Performance Ranking
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-cpn-gray/20">
+                        <th className="text-left py-3 text-cpn-gray font-medium">Rank</th>
+                        <th className="text-left py-3 text-cpn-gray font-medium">Name</th>
+                        <th className="text-left py-3 text-cpn-gray font-medium">Rating</th>
+                        <th className="text-left py-3 text-cpn-gray font-medium">Cost/Nut</th>
+                        <th className="text-left py-3 text-cpn-gray font-medium">Nuts/Hour</th>
+                        <th className="text-left py-3 text-cpn-gray font-medium">Efficiency Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {roiRanking.map((girl, index) => (
+                        <tr key={girl.name} className="border-b border-cpn-gray/10 hover:bg-cpn-gray/5">
+                          <td className="py-3 text-cpn-white">{index + 1}</td>
+                          <td className="py-3 text-cpn-white font-medium">{girl.name}</td>
+                          <td className="py-3 text-cpn-white">{girl.rating}/10</td>
+                          <td className="py-3 text-cpn-white">{formatCurrency(girl.costPerNut)}</td>
+                          <td className="py-3 text-cpn-white">{girl.nutsPerHour}</td>
+                          <td className="py-3 text-cpn-yellow font-bold">{girl.efficiencyScore}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
