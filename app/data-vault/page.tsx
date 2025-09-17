@@ -190,14 +190,13 @@ export default function DataVaultPage() {
                   </p>
                 </div>
               </div>
-              <ComparisonShareButton 
-                data={{ 
-                  userComparison: filteredData?.userComparison, 
+              {/* <ComparisonShareButton
+                data={{
+                  userComparison: filteredData?.userComparison,
                   globalStats: filteredData?.globalStats,
-                  filters 
-                }} 
-                className="ml-4"
-              />
+                  filters
+                }}
+                className="ml-4" /> */}
             </div>
           </div>
         </div>

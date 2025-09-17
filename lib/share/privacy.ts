@@ -71,8 +71,8 @@ export class PrivacyFilter {
 
     // Additional girl-specific filtering
     const filtered: any = {
-      id: settings.anonymizeByDefault ? this.generateAnonymousId() : girl.id,
-      ...baseFiltered
+      ...baseFiltered,
+      id: settings.anonymizeByDefault ? this.generateAnonymousId() : girl.id
     };
 
     // Handle metrics based on privacy level

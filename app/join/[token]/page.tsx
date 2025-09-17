@@ -13,22 +13,20 @@ import { leaderboardGroupsStorage, leaderboardMembersStorage } from '@/lib/leade
 import { LeaderboardGroup } from '@/lib/types';
 
 interface JoinInvitePageProps {
-  params: {
+  params: Promise<{
     token: string;
-  };
+  }>;
 }
 
 export default function JoinInvitePage({ params }: JoinInvitePageProps) {
   const router = useRouter();
+  const token = (params as any).token; // TODO: Next.js 15 params Promise handling
   const [group, setGroup] = useState<LeaderboardGroup | null>(null);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState('');
   const [isJoining, setIsJoining] = useState(false);
   const [error, setError] = useState('');
   const [notFound, setNotFound] = useState(false);
-
-  // TODO: Next.js 15 - params is now a Promise, will be fixed in future version
-  const token = params.token;
 
   useEffect(() => {
     loadGroupData();

@@ -18,20 +18,21 @@ import { LeaderboardGroup, LeaderboardRanking } from '@/lib/types';
 import { formatCurrency } from '@/lib/calculations';
 
 interface GroupDashboardPageProps {
-  params: {
+  params: Promise<{
     groupId: string;
-  };
+  }>;
 }
 
 export default function GroupDashboardPage({ params }: GroupDashboardPageProps) {
   const router = useRouter();
+  const groupId = (params as any).groupId; // TODO: Next.js 15 params Promise handling
   const [group, setGroup] = useState<LeaderboardGroup | null>(null);
   const [rankings, setRankings] = useState<LeaderboardRanking[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
   // TODO: Next.js 15 - params is now a Promise, will be fixed in future version
-  const groupId = params.groupId;
+  // groupId already defined above
 
   useEffect(() => {
     loadGroupData();

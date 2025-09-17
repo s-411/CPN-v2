@@ -14,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useShare } from '@/lib/share/ShareContext';
 import { useGirls, useGlobalStats } from '@/lib/context';
-import { ShareButton, GirlCardShareButton, AnalyticsShareButton, ComparisonShareButton } from '@/components/sharing/ShareButton';
+import ShareButton, { GirlCardShareButton, AnalyticsShareButton, ComparisonShareButton } from '@/components/sharing/ShareButton';
 
 export default function SharePage() {
   const { state, actions } = useShare();

@@ -51,7 +51,7 @@ export default function ShareButton({
           position: 'corner',
           opacity: 0.7,
           includeDomain: true,
-          includeTimestamps: true
+          includeTimestamp: true
         } : undefined
       };
 
@@ -61,7 +61,9 @@ export default function ShareButton({
       } else if (type === 'comparison') {
         await actions.generateComparisonReport(data, options);
       } else if (type === 'achievement') {
-        await actions.generateAchievementBadge(data, options);
+        // await actions.generateAchievementBadge(data, options); // TODO: Implement achievement badges
+        console.warn('Achievement badges not yet implemented');
+        return;
       } else {
         console.warn('Share type not yet implemented:', type);
         return;
