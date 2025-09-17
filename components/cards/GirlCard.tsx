@@ -15,7 +15,7 @@ export default function GirlCard({ girl, onEdit }: GirlCardProps) {
   const hasData = girl.totalEntries > 0;
 
   return (
-    <div className="card-cpn hover:border-cpn-yellow/30 hover:bg-cpn-dark2 transition-all duration-200 group">
+    <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark hover:border-cpn-yellow/30 transition-all duration-200 group">
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-2xl font-heading text-cpn-white group-hover:text-cpn-yellow transition-colors">
