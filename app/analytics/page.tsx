@@ -216,6 +216,54 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
+            {/* Performance Insights */}
+            <div className="card-cpn">
+              <h3 className="text-lg font-heading text-cpn-white mb-4">
+                Performance Insights
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4 border border-cpn-gray/10 rounded-lg">
+                  <div className="text-2xl mb-2">🏆</div>
+                  <p className="text-sm text-cpn-gray mb-1">Best Cost/Nut</p>
+                  <p className="font-heading text-cpn-yellow">
+                    {costPerNutData[costPerNutData.length - 1]?.name || 'N/A'}
+                  </p>
+                  <p className="text-xs text-cpn-gray">
+                    {costPerNutData[costPerNutData.length - 1]
+                      ? formatCurrency(costPerNutData[costPerNutData.length - 1].costPerNut)
+                      : 'No data'
+                    }
+                  </p>
+                </div>
+                <div className="text-center p-4 border border-cpn-gray/10 rounded-lg">
+                  <div className="text-2xl mb-2">💸</div>
+                  <p className="text-sm text-cpn-gray mb-1">Highest Spender</p>
+                  <p className="font-heading text-cpn-yellow">
+                    {spentPerGirlData[0]?.name || 'N/A'}
+                  </p>
+                  <p className="text-xs text-cpn-gray">
+                    {spentPerGirlData[0]
+                      ? formatCurrency(spentPerGirlData[0].amount)
+                      : 'No data'
+                    }
+                  </p>
+                </div>
+                <div className="text-center p-4 border border-cpn-gray/10 rounded-lg">
+                  <div className="text-2xl mb-2">⏰</div>
+                  <p className="text-sm text-cpn-gray mb-1">Most Time Spent</p>
+                  <p className="font-heading text-cpn-yellow">
+                    {timePerGirlData[0]?.name || 'N/A'}
+                  </p>
+                  <p className="text-xs text-cpn-gray">
+                    {timePerGirlData[0]
+                      ? formatTime(timePerGirlData[0].time)
+                      : 'No data'
+                    }
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Total Spent per Girl */}
@@ -227,13 +275,13 @@ export default function AnalyticsPage() {
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={spentPerGirlData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--cpn-gray) / 0.2)" />
-                      <XAxis 
-                        dataKey="name" 
-                        tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fill: '#ababab' }}
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                       />
-                      <YAxis 
-                        tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                      <YAxis
+                        tick={{ fill: '#ababab' }}
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         tickFormatter={(value) => `$${value}`}
                       />
@@ -259,11 +307,11 @@ export default function AnalyticsPage() {
                       <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--cpn-gray) / 0.2)" />
                       <XAxis 
                         dataKey="name" 
-                        tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                        tick={{ fill: '#ababab' }}
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                       />
                       <YAxis 
-                        tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                        tick={{ fill: '#ababab' }}
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         tickFormatter={(value) => `$${value.toFixed(2)}`}
                       />
@@ -289,11 +337,11 @@ export default function AnalyticsPage() {
                       <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--cpn-gray) / 0.2)" />
                       <XAxis 
                         dataKey="name" 
-                        tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                        tick={{ fill: '#ababab' }}
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                       />
                       <YAxis 
-                        tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                        tick={{ fill: '#ababab' }}
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         tickFormatter={(value) => `${Math.round(value / 60)}h`}
                       />
@@ -320,11 +368,11 @@ export default function AnalyticsPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="rgb(var(--cpn-gray) / 0.2)" />
                         <XAxis 
                           dataKey="month" 
-                          tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                          tick={{ fill: '#ababab' }}
                           axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         />
                         <YAxis 
-                          tick={{ fill: 'rgb(var(--cpn-gray))' }}
+                          tick={{ fill: '#ababab' }}
                           axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                           tickFormatter={(value) => `$${value}`}
                         />
@@ -341,54 +389,6 @@ export default function AnalyticsPage() {
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* Performance Insights */}
-            <div className="card-cpn">
-              <h3 className="text-lg font-heading text-cpn-white mb-4">
-                Performance Insights
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center p-4 border border-cpn-gray/10 rounded-lg">
-                  <div className="text-2xl mb-2">🏆</div>
-                  <p className="text-sm text-cpn-gray mb-1">Best Cost/Nut</p>
-                  <p className="font-heading text-cpn-yellow">
-                    {costPerNutData[costPerNutData.length - 1]?.name || 'N/A'}
-                  </p>
-                  <p className="text-xs text-cpn-gray">
-                    {costPerNutData[costPerNutData.length - 1] 
-                      ? formatCurrency(costPerNutData[costPerNutData.length - 1].costPerNut)
-                      : 'No data'
-                    }
-                  </p>
-                </div>
-                <div className="text-center p-4 border border-cpn-gray/10 rounded-lg">
-                  <div className="text-2xl mb-2">💸</div>
-                  <p className="text-sm text-cpn-gray mb-1">Highest Spender</p>
-                  <p className="font-heading text-cpn-yellow">
-                    {spentPerGirlData[0]?.name || 'N/A'}
-                  </p>
-                  <p className="text-xs text-cpn-gray">
-                    {spentPerGirlData[0] 
-                      ? formatCurrency(spentPerGirlData[0].amount)
-                      : 'No data'
-                    }
-                  </p>
-                </div>
-                <div className="text-center p-4 border border-cpn-gray/10 rounded-lg">
-                  <div className="text-2xl mb-2">⏰</div>
-                  <p className="text-sm text-cpn-gray mb-1">Most Time Spent</p>
-                  <p className="font-heading text-cpn-yellow">
-                    {timePerGirlData[0]?.name || 'N/A'}
-                  </p>
-                  <p className="text-xs text-cpn-gray">
-                    {timePerGirlData[0] 
-                      ? formatTime(timePerGirlData[0].time)
-                      : 'No data'
-                    }
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         )}
