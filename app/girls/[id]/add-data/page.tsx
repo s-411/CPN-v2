@@ -11,13 +11,13 @@ import { FormData, DataEntry } from '@/lib/types';
 import { calculateMetricsForGirl, formatRating } from '@/lib/calculations';
 
 interface AddDataPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function AddDataPage({ params }: AddDataPageProps) {
   // TODO: Next.js 15 - params is now a Promise, will be fixed in future version
   // This currently shows a warning but the app functions correctly
-  const id = params.id;
+  const id = (params as any).id;
   const { getGirlById, girls } = useGirls();
   const { addDataEntry, updateDataEntry, deleteDataEntry, getEntriesByGirlId } = useDataEntries();
 

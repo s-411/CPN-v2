@@ -38,7 +38,7 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
 
     // Nationality is now optional
 
-    if (formData.rating < 5.0 || formData.rating > 10.0) {
+    if (typeof formData.rating === 'number' && (formData.rating < 5.0 || formData.rating > 10.0)) {
       newErrors.rating = 'Rating must be between 5.0 and 10.0';
     }
 
@@ -58,7 +58,7 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
         name: formData.name.trim(),
         age: parseInt(formData.age),
         nationality: formData.nationality.trim(),
-        rating: formData.rating
+        rating: typeof formData.rating === 'number' ? formData.rating : parseFloat(formData.rating.toString())
       });
 
       // Reset form
@@ -167,7 +167,7 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
             
             <div className="text-center mb-4">
               <div className="bg-cpn-yellow text-cpn-dark font-bold py-2 px-4 rounded-lg inline-block">
-                {formData.rating.toFixed(1)}/10
+                {(typeof formData.rating === 'number' ? formData.rating : parseFloat(formData.rating.toString())).toFixed(1)}/10
               </div>
             </div>
             

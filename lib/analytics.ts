@@ -5,8 +5,11 @@ export function calculateMetrics(dataEntries: DataEntry[]): AnalyticsMetrics {
     return {
       totalSpent: 0,
       totalNuts: 0,
-      averageCostPerNut: 0,
       totalTime: 0,
+      costPerNut: 0,
+      timePerNut: 0,
+      costPerHour: 0,
+      averageCostPerNut: 0,
       averageTimePerNut: 0,
       averageCostPerHour: 0,
     };
@@ -19,8 +22,11 @@ export function calculateMetrics(dataEntries: DataEntry[]): AnalyticsMetrics {
   return {
     totalSpent,
     totalNuts,
-    averageCostPerNut: totalNuts > 0 ? totalSpent / totalNuts : 0,
     totalTime,
+    costPerNut: totalNuts > 0 ? totalSpent / totalNuts : 0,
+    timePerNut: totalNuts > 0 ? totalTime / totalNuts : 0,
+    costPerHour: totalTime > 0 ? totalSpent / (totalTime / 60) : 0,
+    averageCostPerNut: totalNuts > 0 ? totalSpent / totalNuts : 0,
     averageTimePerNut: totalNuts > 0 ? totalTime / totalNuts : 0,
     averageCostPerHour: totalTime > 0 ? totalSpent / (totalTime / 60) : 0,
   };

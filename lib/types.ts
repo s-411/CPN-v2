@@ -28,7 +28,7 @@ export interface GirlFormData {
   name: string;
   age: string; // String for form input
   nationality: string;
-  rating: number;
+  rating: number | string; // Allow both for validation errors
 }
 
 export interface DataEntryFormData {
@@ -37,6 +37,21 @@ export interface DataEntryFormData {
   amountSpent: string; // String for form input
   durationMinutes: string; // String for form input
   numberOfNuts: string; // String for form input
+}
+
+// Form data for data entry page with hours/minutes split
+export interface FormData {
+  date: string;
+  amountSpent: string;
+  hours: string;
+  minutes: string;
+  numberOfNuts: string;
+}
+
+// Sort configuration for tables
+export interface SortConfig {
+  field: string;
+  direction: 'asc' | 'desc';
 }
 
 // Calculated metrics for a girl
