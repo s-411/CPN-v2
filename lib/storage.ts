@@ -1,4 +1,5 @@
 import { Girl, DataEntry } from './types';
+import { TEMPLATE_GIRLS, TEMPLATE_DATA_ENTRIES } from './templateData';
 
 const GIRLS_STORAGE_KEY = 'cpn_girls';
 const DATA_ENTRIES_STORAGE_KEY = 'cpn_data_entries';
@@ -29,7 +30,14 @@ export const girlsStorage = {
   getAll: (): Girl[] => {
     if (typeof window === 'undefined') return [];
     const stored = localStorage.getItem(GIRLS_STORAGE_KEY);
-    return safeParseJSON(stored, []);
+    const girls = safeParseJSON(stored, []);
+
+    // Load template data if no user data exists (for live deployment)
+    if (girls.length === 0) {
+      return TEMPLATE_GIRLS;
+    }
+
+    return girls;
   },
 
   getById: (id: string): Girl | null => {
@@ -86,7 +94,14 @@ export const dataEntriesStorage = {
   getAll: (): DataEntry[] => {
     if (typeof window === 'undefined') return [];
     const stored = localStorage.getItem(DATA_ENTRIES_STORAGE_KEY);
-    return safeParseJSON(stored, []);
+    const entries = safeParseJSON(stored, []);
+
+    // Load template data if no user data exists (for live deployment)
+    if (entries.length === 0) {
+      return TEMPLATE_DATA_ENTRIES;
+    }
+
+    return entries;
   },
 
   getById: (id: string): DataEntry | null => {
@@ -156,6 +171,22 @@ export const storageUtils = {
   clearAll: (): void => {
     localStorage.removeItem(GIRLS_STORAGE_KEY);
     localStorage.removeItem(DATA_ENTRIES_STORAGE_KEY);
+  },
+
+  isUsingTemplateData: (): boolean => {
+    if (typeof window === 'undefined') return false;
+    const storedGirls = localStorage.getItem(GIRLS_STORAGE_KEY);
+    const storedEntries = localStorage.getItem(DATA_ENTRIES_STORAGE_KEY);
+    return !storedGirls && !storedEntries;
+  },
+
+  clearTemplateData: (): void => {
+    // This forces the system to stop returning template data
+    // by setting empty arrays in localStorage
+    if (storageUtils.isUsingTemplateData()) {
+      localStorage.setItem(GIRLS_STORAGE_KEY, JSON.stringify([]));
+      localStorage.setItem(DATA_ENTRIES_STORAGE_KEY, JSON.stringify([]));
+    }
   },
 
   exportData: () => {
