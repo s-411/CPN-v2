@@ -14,6 +14,7 @@ import { useGirls, useDataEntries } from '@/lib/context';
 import { GirlWithMetrics, SortConfig } from '@/lib/types';
 import { formatCurrency, formatTime, formatRating, sortGirlsByField } from '@/lib/calculations';
 import EditGirlModal from '@/components/modals/EditGirlModal';
+import AddGirlModal from '@/components/modals/AddGirlModal';
 
 export default function OverviewPage() {
   const { girlsWithMetrics, deleteGirl } = useGirls();
@@ -24,6 +25,7 @@ export default function OverviewPage() {
   });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [editingGirl, setEditingGirl] = useState<GirlWithMetrics | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleSort = (field: string) => {
     setSortConfig(prev => ({
@@ -81,10 +83,13 @@ export default function OverviewPage() {
                 </p>
               </div>
             </div>
-            <Link href="/girls" className="btn-cpn flex items-center gap-2">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="btn-cpn flex items-center gap-2"
+            >
               <PlusIcon className="w-5 h-5" />
               Add New Girl
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -349,6 +354,12 @@ export default function OverviewPage() {
           girl={editingGirl}
         />
       )}
+
+      {/* Add Girl Modal */}
+      <AddGirlModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 }
