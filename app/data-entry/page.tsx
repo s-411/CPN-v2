@@ -128,7 +128,7 @@ export default function DataEntryPage() {
           </div>
         ) : (
           <div className="animate-fade-in">
-            <div className="card-cpn">
+            <div className="card-cpn-form">
               <div className="mb-6">
                 <h2 className="text-xl font-heading text-cpn-white flex items-center gap-2 mb-2">
                   <span>➕</span>

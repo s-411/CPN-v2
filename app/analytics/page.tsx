@@ -18,6 +18,7 @@ import {
 import { useGirls, useDataEntries, useGlobalStats } from '@/lib/context';
 import { formatCurrency, formatTime, getMonthlyTrends } from '@/lib/calculations';
 import { AnalyticsShareButton } from '@/components/sharing/ShareButton';
+import { getGirlColors, getColorByGirlName } from '@/lib/colors';
 
 type TimeRange = '7' | '30' | '90' | 'all';
 
@@ -40,45 +41,41 @@ export default function AnalyticsPage() {
   const filteredEntries = getFilteredEntries();
   const monthlyTrends = getMonthlyTrends(filteredEntries);
 
+  // Get active girls with data
+  const activeGirls = girlsWithMetrics.filter(girl => girl.totalEntries > 0);
+
+  // Get consistent colors for all girls
+  const girlColorMap = getGirlColors(activeGirls.map(girl => girl.id));
+
   // Data for Total Spent per Girl chart
-  const spentPerGirlData = girlsWithMetrics
-    .filter(girl => girl.totalEntries > 0)
+  const spentPerGirlData = activeGirls
     .map(girl => ({
       name: girl.name,
       amount: girl.metrics.totalSpent,
-      nuts: girl.metrics.totalNuts
+      nuts: girl.metrics.totalNuts,
+      color: girlColorMap[girl.id]
     }))
     .sort((a, b) => b.amount - a.amount);
 
   // Data for Cost per Nut comparison
-  const costPerNutData = girlsWithMetrics
-    .filter(girl => girl.totalEntries > 0)
+  const costPerNutData = activeGirls
     .map(girl => ({
       name: girl.name,
       costPerNut: girl.metrics.costPerNut,
-      rating: girl.rating
+      rating: girl.rating,
+      color: girlColorMap[girl.id]
     }))
     .sort((a, b) => b.costPerNut - a.costPerNut);
 
   // Data for Time spent per girl
-  const timePerGirlData = girlsWithMetrics
-    .filter(girl => girl.totalEntries > 0)
+  const timePerGirlData = activeGirls
     .map(girl => ({
       name: girl.name,
       time: girl.metrics.totalTime,
-      timeFormatted: formatTime(girl.metrics.totalTime)
+      timeFormatted: formatTime(girl.metrics.totalTime),
+      color: girlColorMap[girl.id]
     }))
     .sort((a, b) => b.time - a.time);
-
-  // Colors for charts
-  const chartColors = [
-    'rgb(var(--cpn-yellow))',
-    '#22c55e',
-    '#3b82f6',
-    '#f59e0b',
-    '#ef4444',
-    '#8b5cf6'
-  ];
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -264,6 +261,29 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
+            {/* Color Legend */}
+            {activeGirls.length > 1 && (
+              <div className="card-cpn">
+                <h3 className="text-lg font-heading text-cpn-white mb-4">
+                  Color Legend
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                  {activeGirls.map(girl => (
+                    <div key={girl.id} className="flex items-center gap-2">
+                      <div
+                        className="w-4 h-4 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: girlColorMap[girl.id] }}
+                      ></div>
+                      <span className="text-sm text-cpn-white truncate">{girl.name}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-cpn-gray mt-3">
+                  Each girl maintains the same color across all charts for easy identification
+                </p>
+              </div>
+            )}
+
             {/* Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Total Spent per Girl */}
@@ -285,12 +305,18 @@ export default function AnalyticsPage() {
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         tickFormatter={(value) => `$${value}`}
                       />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Bar 
-                        dataKey="amount" 
-                        fill="rgb(var(--cpn-yellow))"
-                        radius={[4, 4, 0, 0]}
+                      <Tooltip
+                        content={<CustomTooltip />}
+                        cursor={{ fill: 'transparent' }}
                       />
+                      <Bar
+                        dataKey="amount"
+                        radius={[4, 4, 0, 0]}
+                      >
+                        {spentPerGirlData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -315,12 +341,18 @@ export default function AnalyticsPage() {
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         tickFormatter={(value) => `$${value.toFixed(2)}`}
                       />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Bar 
-                        dataKey="costPerNut" 
-                        fill="#22c55e"
-                        radius={[4, 4, 0, 0]}
+                      <Tooltip
+                        content={<CustomTooltip />}
+                        cursor={{ fill: 'transparent' }}
                       />
+                      <Bar
+                        dataKey="costPerNut"
+                        radius={[4, 4, 0, 0]}
+                      >
+                        {costPerNutData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -345,12 +377,18 @@ export default function AnalyticsPage() {
                         axisLine={{ stroke: 'rgb(var(--cpn-gray) / 0.2)' }}
                         tickFormatter={(value) => `${Math.round(value / 60)}h`}
                       />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Bar 
-                        dataKey="time" 
-                        fill="#3b82f6"
-                        radius={[4, 4, 0, 0]}
+                      <Tooltip
+                        content={<CustomTooltip />}
+                        cursor={{ fill: 'transparent' }}
                       />
+                      <Bar
+                        dataKey="time"
+                        radius={[4, 4, 0, 0]}
+                      >
+                        {timePerGirlData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

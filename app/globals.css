@@ -181,6 +181,13 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1.5rem;
 }
 
+.card-cpn-form {
+  background-color: var(--color-cpn-dark2);
+  border: 1px solid color-mix(in srgb, var(--color-cpn-gray) 25%, transparent);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
 .glass-card {
   background-color: color-mix(in srgb, var(--color-cpn-dark) 80%, transparent);
   backdrop-filter: blur(4px);

@@ -18,6 +18,7 @@ import {
 import { useGirls, useDataEntries, useGlobalStats } from '@/lib/context';
 import { formatCurrency, formatTime, formatRating } from '@/lib/calculations';
 import AddGirlModal from '@/components/modals/AddGirlModal';
+import { GradientIcon } from '@/components/ui/GradientIcon';
 
 export default function TestDashboardPage() {
   const { girlsWithMetrics } = useGirls();
@@ -65,8 +66,8 @@ export default function TestDashboardPage() {
       <div className="border-b border-cpn-gray/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
-            <div className="flex items-center gap-3 mb-4">
-              <ChartBarIcon className="w-8 h-8 text-cpn-yellow" />
+            <div className="flex items-center gap-4 mb-4">
+              <GradientIcon icon={ChartBarIcon} variant="blue" size="lg" />
               <div>
                 <h1 className="text-3xl font-heading text-cpn-white">Dashboard</h1>
                 <p className="text-cpn-gray mt-1">
@@ -109,9 +110,7 @@ export default function TestDashboardPage() {
               {/* Total Investment */}
               <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-cpn-yellow/10 rounded-lg">
-                    <CurrencyDollarIcon className="w-6 h-6 text-cpn-yellow" />
-                  </div>
+                  <GradientIcon icon={CurrencyDollarIcon} variant="yellow" size="md" />
                   <div className="flex items-center gap-1">
                     <ArrowUpIcon className="w-4 h-4 text-green-400" />
                     <span className="text-xs text-green-400">+12%</span>
@@ -129,9 +128,7 @@ export default function TestDashboardPage() {
               {/* Efficiency Score */}
               <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-green-500/10 rounded-lg">
-                    <TrophyIcon className="w-6 h-6 text-green-400" />
-                  </div>
+                  <GradientIcon icon={TrophyIcon} variant="green" size="md" />
                   <div className="flex items-center gap-1">
                     {avgCostPerNut < 50 ? (
                       <>
@@ -158,9 +155,7 @@ export default function TestDashboardPage() {
               {/* Time Investment */}
               <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-blue-500/10 rounded-lg">
-                    <ClockIcon className="w-6 h-6 text-blue-400" />
-                  </div>
+                  <GradientIcon icon={ClockIcon} variant="blue" size="md" />
                   <div className="flex items-center gap-1">
                     <span className="text-xs text-cpn-gray">
                       {Math.round(globalStats.totalTime / 60)} hrs
@@ -181,9 +176,7 @@ export default function TestDashboardPage() {
               {/* Active Profiles */}
               <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2 bg-purple-500/10 rounded-lg">
-                    <UserGroupIcon className="w-6 h-6 text-purple-400" />
-                  </div>
+                  <GradientIcon icon={UserGroupIcon} variant="purple" size="md" />
                   <div className="flex items-center gap-1">
                     <FireIcon className="w-4 h-4 text-orange-400" />
                     <span className="text-xs text-orange-400">Active</span>
@@ -208,9 +201,7 @@ export default function TestDashboardPage() {
                 {/* Best Value */}
                 <div className="bg-cpn-dark border border-green-500/20 rounded-lg p-6 hover:border-green-500/40 transition-colors">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-green-500/10 rounded-lg">
-                      <TrophyIcon className="w-6 h-6 text-green-400" />
-                    </div>
+                    <GradientIcon icon={TrophyIcon} variant="green" size="md" />
                     <div>
                       <h3 className="font-heading text-green-400">Best Value</h3>
                       <p className="text-xs text-cpn-gray">Lowest cost per nut</p>
@@ -248,9 +239,7 @@ export default function TestDashboardPage() {
                 {/* Highest Investment */}
                 <div className="bg-cpn-dark border border-cpn-yellow/20 rounded-lg p-6 hover:border-cpn-yellow/40 transition-colors">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-cpn-yellow/10 rounded-lg">
-                      <CurrencyDollarIcon className="w-6 h-6 text-cpn-yellow" />
-                    </div>
+                    <GradientIcon icon={CurrencyDollarIcon} variant="yellow" size="md" />
                     <div>
                       <h3 className="font-heading text-cpn-yellow">Highest Investment</h3>
                       <p className="text-xs text-cpn-gray">Most money spent</p>
@@ -288,9 +277,7 @@ export default function TestDashboardPage() {
                 {/* Most Time */}
                 <div className="bg-cpn-dark border border-blue-500/20 rounded-lg p-6 hover:border-blue-500/40 transition-colors">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2 bg-blue-500/10 rounded-lg">
-                      <ClockIcon className="w-6 h-6 text-blue-400" />
-                    </div>
+                    <GradientIcon icon={ClockIcon} variant="teal" size="md" />
                     <div>
                       <h3 className="font-heading text-blue-400">Most Time</h3>
                       <p className="text-xs text-cpn-gray">Highest time investment</p>
@@ -523,9 +510,7 @@ export default function TestDashboardPage() {
                   className="p-6 bg-gradient-to-br from-cpn-yellow/10 to-cpn-yellow/5 border border-cpn-yellow/20 rounded-lg hover:border-cpn-yellow/40 transition-all duration-200 hover:scale-105 group"
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="p-3 bg-cpn-yellow/20 rounded-full mb-3 group-hover:bg-cpn-yellow/30 transition-colors">
-                      <PlusIcon className="w-6 h-6 text-cpn-yellow" />
-                    </div>
+                    <GradientIcon icon={PlusIcon} variant="yellow" size="md" className="mb-3" />
                     <h3 className="font-heading text-cpn-white mb-1">Add Data</h3>
                     <p className="text-xs text-cpn-gray">Log new activity</p>
                   </div>
@@ -537,9 +522,7 @@ export default function TestDashboardPage() {
                   className="p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-lg hover:border-green-500/40 transition-all duration-200 hover:scale-105 group"
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="p-3 bg-green-500/20 rounded-full mb-3 group-hover:bg-green-500/30 transition-colors">
-                      <UserGroupIcon className="w-6 h-6 text-green-400" />
-                    </div>
+                    <GradientIcon icon={UserGroupIcon} variant="green" size="md" className="mb-3" />
                     <h3 className="font-heading text-cpn-white mb-1">Add Girl</h3>
                     <p className="text-xs text-cpn-gray">Create new profile</p>
                   </div>
@@ -551,9 +534,7 @@ export default function TestDashboardPage() {
                   className="p-6 bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-lg hover:border-blue-500/40 transition-all duration-200 hover:scale-105 group"
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="p-3 bg-blue-500/20 rounded-full mb-3 group-hover:bg-blue-500/30 transition-colors">
-                      <ChartBarIcon className="w-6 h-6 text-blue-400" />
-                    </div>
+                    <GradientIcon icon={ChartBarIcon} variant="blue" size="md" className="mb-3" />
                     <h3 className="font-heading text-cpn-white mb-1">Analytics</h3>
                     <p className="text-xs text-cpn-gray">Deep dive insights</p>
                   </div>
@@ -565,9 +546,7 @@ export default function TestDashboardPage() {
                   className="p-6 bg-gradient-to-br from-purple-500/10 to-purple-500/5 border border-purple-500/20 rounded-lg hover:border-purple-500/40 transition-all duration-200 hover:scale-105 group"
                 >
                   <div className="flex flex-col items-center text-center">
-                    <div className="p-3 bg-purple-500/20 rounded-full mb-3 group-hover:bg-purple-500/30 transition-colors">
-                      <PlayIcon className="w-6 h-6 text-purple-400" />
-                    </div>
+                    <GradientIcon icon={PlayIcon} variant="purple" size="md" className="mb-3" />
                     <h3 className="font-heading text-cpn-white mb-1">Overview</h3>
                     <p className="text-xs text-cpn-gray">All data table</p>
                   </div>

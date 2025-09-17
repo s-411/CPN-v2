@@ -165,7 +165,7 @@ export default function AddDataPage({ params }: AddDataPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column - Form */}
           <div className="space-y-6">
-            <div className="card-cpn">
+            <div className="card-cpn-form">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-heading text-cpn-white flex items-center gap-2">
                   <span>➕</span>
