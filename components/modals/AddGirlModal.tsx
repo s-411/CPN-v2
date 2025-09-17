@@ -98,8 +98,13 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-cpn-dark border border-cpn-gray/20 rounded-lg w-full max-w-md animate-slide-up">
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-cpn-dark border border-cpn-gray/20 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto animate-slide-up">
         <div className="flex items-center justify-between p-6 border-b border-cpn-gray/20">
           <h2 className="text-xl font-heading text-cpn-white">Add New Girl</h2>
           <button
@@ -241,12 +246,6 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
             <label className="block text-sm font-medium text-cpn-white mb-4">
               Hotness Rating *
             </label>
-            
-            <div className="text-center mb-4">
-              <div className="bg-cpn-yellow text-cpn-dark font-bold py-2 px-4 rounded-lg inline-block">
-                {(typeof formData.rating === 'number' ? formData.rating : parseFloat(formData.rating.toString())).toFixed(1)}/10
-              </div>
-            </div>
             
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm text-cpn-gray">5.0</span>

@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { PencilIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { GirlWithMetrics } from '@/lib/types';
 import { formatCurrency, formatTime, formatRating } from '@/lib/calculations';
-import { GirlCardShareButton } from '@/components/sharing/ShareButton';
 
 interface GirlCardProps {
   girl: GirlWithMetrics;
@@ -31,21 +30,13 @@ export default function GirlCard({ girl, onEdit }: GirlCardProps) {
             </span>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {hasData && (
-            <GirlCardShareButton 
-              girl={girl} 
-              className="text-cpn-gray hover:text-cpn-yellow transition-colors p-1"
-            />
-          )}
-          <button
-            onClick={() => onEdit(girl)}
-            className="text-cpn-gray hover:text-cpn-white transition-colors p-1"
-            title="Edit profile"
-          >
-            <PencilIcon className="w-5 h-5" />
-          </button>
-        </div>
+        <button
+          onClick={() => onEdit(girl)}
+          className="text-cpn-gray hover:text-cpn-white transition-colors p-1"
+          title="Edit profile"
+        >
+          <PencilIcon className="w-5 h-5" />
+        </button>
       </div>
 
       {hasData ? (

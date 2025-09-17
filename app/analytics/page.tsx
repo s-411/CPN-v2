@@ -65,35 +65,32 @@ export default function AnalyticsPage() {
   const roiRanking = getROIRanking(activeGirls);
   const enhancedStats = getEnhancedGlobalStats(girlsWithMetrics, dataEntries, filteredEntries);
 
-  // Data for Total Spent per Girl chart
+  // Data for Total Spent per Girl chart - maintain chronological order
   const spentPerGirlData = activeGirls
     .map(girl => ({
       name: girl.name,
       amount: girl.metrics.totalSpent,
       nuts: girl.metrics.totalNuts,
       color: girlColorMap[girl.id]
-    }))
-    .sort((a, b) => b.amount - a.amount);
+    }));
 
-  // Data for Cost per Nut comparison
+  // Data for Cost per Nut comparison - maintain chronological order
   const costPerNutData = activeGirls
     .map(girl => ({
       name: girl.name,
       costPerNut: girl.metrics.costPerNut,
       rating: girl.rating,
       color: girlColorMap[girl.id]
-    }))
-    .sort((a, b) => b.costPerNut - a.costPerNut);
+    }));
 
-  // Data for Time spent per girl
+  // Data for Time spent per girl - maintain chronological order
   const timePerGirlData = activeGirls
     .map(girl => ({
       name: girl.name,
       time: girl.metrics.totalTime,
       timeFormatted: formatTime(girl.metrics.totalTime),
       color: girlColorMap[girl.id]
-    }))
-    .sort((a, b) => b.time - a.time);
+    }));
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
