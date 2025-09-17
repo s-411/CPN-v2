@@ -14,7 +14,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const navigationItems = [
-  { name: 'Dashboard', href: '/girls', icon: HomeIcon, active: true },
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, active: true },
   { name: 'Overview', href: '/overview', icon: TableCellsIcon, active: true },
   { name: 'Add', href: '/data-entry', icon: PlusIcon, active: true, isSpecial: true },
   { name: 'Share', href: '/share', icon: ShareIcon, active: true },
@@ -26,10 +26,13 @@ export default function MobileNav() {
   const pathname = usePathname();
 
   const isActive = (href: string) => {
-    if (href === '/girls' && (pathname === '/' || pathname === '/girls')) {
+    if (href === '/dashboard' && (pathname === '/' || pathname === '/dashboard')) {
       return true;
     }
-    return pathname.startsWith(href) && href !== '/girls' ? true : pathname === href;
+    if (href === '/girls' && pathname === '/girls') {
+      return true;
+    }
+    return pathname.startsWith(href) && href !== '/girls' && href !== '/dashboard' ? true : pathname === href;
   };
 
   return (

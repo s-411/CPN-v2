@@ -152,13 +152,20 @@ const ShareContext = createContext<{
 // Provider component
 export function ShareProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(shareReducer, initialState);
-  const shareService = ShareService.getInstance();
+  const [shareService, setShareService] = React.useState<ShareService | null>(null);
+
+  // Initialize ShareService only on client-side
+  useEffect(() => {
+    setShareService(ShareService.getInstance());
+  }, []);
 
   // Load preferences and history on mount
   useEffect(() => {
-    loadPreferences();
-    refreshHistory();
-  }, []);
+    if (shareService) {
+      loadPreferences();
+      refreshHistory();
+    }
+  }, [shareService]);
 
   // Save preferences when they change
   useEffect(() => {
@@ -186,12 +193,14 @@ export function ShareProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshHistory = () => {
+    if (!shareService) return;
     const history = shareService.getShareHistory();
     dispatch({ type: 'UPDATE_HISTORY', payload: history });
   };
 
   const actions = {
     generateStatCard: async (data: any, options: ShareOptions) => {
+      if (!shareService) return;
       try {
         dispatch({ type: 'SET_STATUS', payload: 'generating' });
         const content = await shareService.generateStatCard(data, options);
@@ -202,6 +211,7 @@ export function ShareProvider({ children }: { children: ReactNode }) {
     },
 
     generateComparisonReport: async (data: any, options: ShareOptions) => {
+      if (!shareService) return;
       try {
         dispatch({ type: 'SET_STATUS', payload: 'generating' });
         const content = await shareService.generateComparisonReport(data, options);
@@ -212,6 +222,7 @@ export function ShareProvider({ children }: { children: ReactNode }) {
     },
 
     generateAchievementBadge: async (data: any, options: ShareOptions) => {
+      if (!shareService) return;
       try {
         dispatch({ type: 'SET_STATUS', payload: 'generating' });
         const content = await shareService.generateAchievementBadge(data, options);
@@ -222,7 +233,7 @@ export function ShareProvider({ children }: { children: ReactNode }) {
     },
 
     shareViaClipboard: async (format?: ShareFormat) => {
-      if (!state.activeShare.content) return false;
+      if (!shareService || !state.activeShare.content) return false;
 
       try {
         const formatToUse = format || state.preferences.defaultFormat;
@@ -241,7 +252,7 @@ export function ShareProvider({ children }: { children: ReactNode }) {
     },
 
     shareViaDownload: async (format?: ShareFormat, filename?: string) => {
-      if (!state.activeShare.content) return;
+      if (!shareService || !state.activeShare.content) return;
 
       try {
         const formatToUse = format || state.preferences.defaultFormat;
@@ -257,8 +268,8 @@ export function ShareProvider({ children }: { children: ReactNode }) {
     },
 
     shareViaURL: async () => {
-      if (!state.activeShare.content) return '';
-      
+      if (!shareService || !state.activeShare.content) return '';
+
       try {
         const url = await shareService.shareViaURL(state.activeShare.content);
         refreshHistory();

@@ -9,7 +9,10 @@ export class ShareService {
   private shareHistory: ShareHistoryEntry[] = [];
 
   private constructor() {
-    this.loadShareHistory();
+    // Only load history on client-side
+    if (typeof window !== 'undefined') {
+      this.loadShareHistory();
+    }
   }
 
   static getInstance(): ShareService {
@@ -222,6 +225,10 @@ export class ShareService {
    * Generate URL for sharing
    */
   async shareViaURL(content: ShareableContent): Promise<string> {
+    if (typeof window === 'undefined') {
+      throw new Error('URL sharing not available on server-side');
+    }
+
     // Compress and encode content for URL
     const compressed = this.compressData(JSON.stringify(content));
     const encoded = btoa(compressed);
@@ -230,7 +237,7 @@ export class ShareService {
       version: '1',
       type: content.type as any,
       data: encoded,
-      expires: content.metadata.privacy.expirationTime ? 
+      expires: content.metadata.privacy.expirationTime ?
         Date.now() + (content.metadata.privacy.expirationTime * 60 * 60 * 1000) : undefined
     };
 
@@ -251,6 +258,10 @@ export class ShareService {
    * Get share history
    */
   getShareHistory(): ShareHistoryEntry[] {
+    // Ensure history is loaded on first access
+    if (typeof window !== 'undefined' && this.shareHistory.length === 0) {
+      this.loadShareHistory();
+    }
     return [...this.shareHistory];
   }
 
