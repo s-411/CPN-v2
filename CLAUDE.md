@@ -40,13 +40,26 @@ The application uses React Context with useReducer for centralized state managem
 - **Calculated Metrics**: Real-time computation via `lib/calculations.ts`
 - **Responsive Navigation**: Sidebar (desktop) + MobileNav (mobile) with shared navigation items
 - **Form Patterns**: Controlled inputs with validation and error states
+- **Sharing System**: Canvas-based image generation with privacy-first architecture via `lib/share/`
+- **Progressive Disclosure**: Mobile-responsive patterns with expandable content sections
 
 ## File Structure & Key Components
 
 ### Layout Structure
 - **Root Layout** (`app/layout.tsx`): AppProvider + Sidebar + MobileNav wrapper
-- **Navigation**: Responsive with active states and "coming soon" disabled items
+- **Navigation**: Responsive with active states, Share and Overview pages now active
 - **Pages**: Follow Next.js 15 App Router with dynamic routes for girls/[id]/add-data
+
+### Sharing System Architecture
+- **ShareService** (`lib/share/ShareService.ts`): Core sharing logic with privacy filtering
+- **ShareContext** (`lib/share/ShareContext.tsx`): React context for sharing state management
+- **Card Generation** (`lib/share/generators/`): Canvas-based image generation for shareable content
+- **Privacy Controls** (`lib/share/privacy.ts`): Data anonymization and filtering system
+- **Share Components** (`components/sharing/`): Reusable sharing UI components
+
+### New Page Components
+- **Overview Page** (`app/overview/page.tsx`): Comprehensive tabular data view with mobile-responsive cards
+- **Share Dashboard** (`app/share/page.tsx`): Social sharing hub with achievement badges and stat cards
 
 ### Core Data Models
 ```typescript
@@ -84,6 +97,8 @@ interface GirlWithMetrics extends Girl {
 - **Cost per Nut** = Total Spent / Total Nuts
 - **Time per Nut** = Total Time / Total Nuts (in minutes)
 - **Cost per Hour** = Total Spent / (Total Time in hours)
+- **Nuts per Hour** = Total Nuts / (Total Time in hours) - Added to Overview page
+- **Sharing Privacy** = Client-side data filtering with configurable anonymization
 
 ## Design System Implementation
 
@@ -125,7 +140,8 @@ interface GirlWithMetrics extends Girl {
 ### Navigation Behavior
 - **Active States**: Yellow highlighting for current page
 - **Route Matching**: Special handling for `/girls` route (dashboard)
-- **Disabled Items**: Grayed out "coming soon" features (Leaderboards, Share, Subscription)
+- **Active Features**: Overview (TableCellsIcon), Share (ShareIcon), Analytics, Data Vault all functional
+- **Disabled Items**: Grayed out "coming soon" features (Leaderboards, Subscription)
 
 ## Next.js 15 Specific Notes
 
@@ -167,8 +183,10 @@ const id = params.id; // Shows warning but app functions correctly
 #### Phase 1 - Feature Implementation (Current)
 1. Build rough but complete versions of all features
 2. Focus on functionality over visual polish
-3. Create placeholder pages for: Leaderboards, Share, Profile, Settings, Billing, Data Vault
-4. Implement mock multi-user data for testing complete feature set
+3. ✅ **Completed**: Overview page (1.45), Share dashboard with full functionality (1.6)
+4. ✅ **Completed**: Canvas-based sharing system with privacy controls
+5. Create placeholder pages for: Leaderboards, Profile, Settings, Billing
+6. Implement mock multi-user data for testing complete feature set
 
 #### Post-Phase 1 - System-Wide Polish
 1. Design system perfection with full feature context
@@ -200,3 +218,55 @@ const id = params.id; // Shows warning but app functions correctly
 - **postcss.config.mjs**: Tailwind CSS 4.0 PostCSS plugin
 - **tsconfig.json**: Strict TypeScript with path aliases (@/)
 - **.gitignore**: Excludes node_modules, .next, .env.local
+
+## Recently Implemented Features
+
+### 1.45 Overview Page Implementation (Completed)
+- **Spreadsheet-style interface** with comprehensive tabular data view
+- **All core metrics displayed**: Name, Rating, Total Nuts, Total Spent, Cost per Nut, Total Time, Time per Nut, Cost per Hour, **Nuts per Hour** (newly added)
+- **Row-level actions**: Add Data (direct navigation), Edit Profile (modal), Delete Profile (confirmation)
+- **Advanced sorting**: All columns sortable with visual indicators and persistent preferences
+- **Mobile responsive design**: Card-based layout with progressive disclosure pattern
+- **Enhanced mobile UX**: 3-column metric grid, expandable details, touch-optimized actions
+- **Location**: `app/overview/page.tsx` with TableCellsIcon in navigation
+
+### 1.6 Sharing Feature Implementation (Completed)
+- **Comprehensive sharing system** with privacy-first architecture
+- **Canvas-based image generation** for shareable statistics and achievement cards
+- **ShareService architecture**: Core sharing logic with format conversion (image, HTML, markdown, JSON)
+- **Privacy controls**: Configurable data anonymization and filtering via `lib/share/privacy.ts`
+- **ShareButton components**: Multiple variants (primary, secondary, icon-only) with convenience wrappers
+- **SharePreviewModal**: Live preview with format selection and privacy controls
+- **Achievement badge system**: Tier-based unlockables with visual badge generation
+- **File structure**: Complete `/lib/share/` directory with modular architecture
+  - `ShareService.ts`: Core sharing functionality
+  - `ShareContext.tsx`: React context for state management
+  - `types.ts`: Comprehensive TypeScript interfaces
+  - `privacy.ts`: Data filtering and anonymization
+  - `generators/CardGenerator.ts`: Canvas-based image generation
+- **Component integration**: ShareButtons added to Girls, Analytics, and Data Vault pages
+- **Location**: `app/share/page.tsx` with ShareIcon activated in navigation
+
+### Mobile Responsiveness Enhancements
+- **Overview page mobile optimization**: Transformed desktop table into intuitive card system
+- **Progressive disclosure pattern**: "More metrics" expandable section to reduce cognitive load
+- **Touch-optimized interactions**: Larger tap targets, improved spacing, visual feedback
+- **Responsive breakpoints**: Clean transitions between desktop table and mobile cards
+- **Action button optimization**: Prominent "Add Data" CTA with compact edit/delete actions
+
+### Navigation System Updates
+- **Overview navigation**: Added TableCellsIcon to both Sidebar and MobileNav
+- **Share activation**: Enabled Share navigation item across all breakpoints
+- **Route handling**: Proper active state management for new pages
+- **Consistency**: Maintained design patterns across existing and new navigation items
+
+### Development Infrastructure
+- **TodoWrite integration**: Systematic progress tracking for complex multi-step implementations
+- **Type safety**: Added SortConfig and other missing TypeScript interfaces to `lib/types.ts`
+- **Context integration**: New features properly integrated with existing useGirls and useDataEntries hooks
+- **Error handling**: Proper validation and error states for new components
+
+### Roadmap Documentation Updates
+- **1.45 Overview Page**: Added between existing features with comprehensive mobile UX documentation
+- **1.7 Onboarding Flow**: Complete 5-step user acquisition funnel with Clerk authentication and Stripe integration
+- **1.8 Affiliate Integration**: Rewardful-powered affiliate system with zero-friction activation and built-in viral sharing

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useGirls } from '@/lib/context';
-import { GirlFormData } from '@/lib/types';
+import { GirlFormData, EthnicityOption, HairColorOption } from '@/lib/types';
 
 interface AddGirlModalProps {
   isOpen: boolean;
@@ -21,7 +21,10 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
     name: '',
     age: '',
     nationality: '',
-    rating: 6.0
+    rating: 6.0,
+    ethnicity: undefined,
+    hairColor: undefined,
+    location: undefined
   });
 
   const validateForm = (): boolean => {
@@ -58,7 +61,12 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
         name: formData.name.trim(),
         age: parseInt(formData.age),
         nationality: formData.nationality.trim(),
-        rating: typeof formData.rating === 'number' ? formData.rating : parseFloat(formData.rating.toString())
+        rating: typeof formData.rating === 'number' ? formData.rating : parseFloat(formData.rating.toString()),
+        ethnicity: formData.ethnicity,
+        hairColor: formData.hairColor,
+        location: formData.location && (formData.location.city || formData.location.country)
+          ? formData.location
+          : undefined
       });
 
       // Reset form
@@ -66,7 +74,10 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
         name: '',
         age: '',
         nationality: '',
-        rating: 6.0
+        rating: 6.0,
+        ethnicity: undefined,
+        hairColor: undefined,
+        location: undefined
       });
       setErrors({});
       onClose();
@@ -140,24 +151,90 @@ export default function AddGirlModal({ isOpen, onClose }: AddGirlModalProps) {
             </label>
             <p className="text-sm text-cpn-gray mb-2">This information is optional and helps with analytics</p>
             <select
-              value={formData.nationality}
-              onChange={(e) => setFormData(prev => ({ ...prev, nationality: e.target.value }))}
+              value={formData.ethnicity || ''}
+              onChange={(e) => setFormData(prev => ({ 
+                ...prev, 
+                ethnicity: e.target.value as EthnicityOption || undefined,
+                nationality: e.target.value // Keep nationality in sync for backward compatibility
+              }))}
               className="input-cpn"
             >
               <option value="">Prefer not to say</option>
               <option value="Asian">Asian</option>
-              <option value="Black/African American">Black/African American</option>
-              <option value="Hispanic/Latino">Hispanic/Latino</option>
-              <option value="White/Caucasian">White/Caucasian</option>
+              <option value="Black">Black</option>
+              <option value="Latina">Latina</option>
+              <option value="White">White</option>
               <option value="Middle Eastern">Middle Eastern</option>
+              <option value="Indian">Indian</option>
+              <option value="Mixed">Mixed</option>
               <option value="Native American">Native American</option>
               <option value="Pacific Islander">Pacific Islander</option>
-              <option value="Mixed/Multiracial">Mixed/Multiracial</option>
               <option value="Other">Other</option>
             </select>
-            {errors.nationality && (
-              <p className="text-red-400 text-sm mt-1">{errors.nationality}</p>
-            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-cpn-white mb-2">
+              Hair Color (Optional)
+            </label>
+            <p className="text-sm text-cpn-gray mb-2">This information is optional and helps with analytics</p>
+            <select
+              value={formData.hairColor || ''}
+              onChange={(e) => setFormData(prev => ({ 
+                ...prev, 
+                hairColor: e.target.value as HairColorOption || undefined
+              }))}
+              className="input-cpn"
+            >
+              <option value="">Prefer not to say</option>
+              <option value="Blonde">Blonde</option>
+              <option value="Brunette">Brunette</option>
+              <option value="Black">Black</option>
+              <option value="Red">Red</option>
+              <option value="Auburn">Auburn</option>
+              <option value="Gray/Silver">Gray/Silver</option>
+              <option value="Dyed/Colorful">Dyed/Colorful</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-cpn-white mb-2">
+              Location (Optional)
+            </label>
+            <p className="text-sm text-cpn-gray mb-2">This information is optional and helps with analytics</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <input
+                  type="text"
+                  value={formData.location?.city || ''}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    location: { 
+                      ...prev.location,
+                      city: e.target.value || undefined
+                    }
+                  }))}
+                  className="input-cpn"
+                  placeholder="City"
+                />
+              </div>
+              <div>
+                <input
+                  type="text"
+                  value={formData.location?.country || ''}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    location: { 
+                      ...prev.location,
+                      country: e.target.value || undefined
+                    }
+                  }))}
+                  className="input-cpn"
+                  placeholder="Country"
+                />
+              </div>
+            </div>
           </div>
 
           <div>

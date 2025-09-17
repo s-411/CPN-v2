@@ -9,16 +9,17 @@ import {
   PlusIcon, 
   ShareIcon,
   UsersIcon,
-  TrophyIcon
+  TrophyIcon,
+  TableCellsIcon
 } from '@heroicons/react/24/outline';
 
 const navigationItems = [
   { name: 'Dashboard', href: '/girls', icon: HomeIcon, active: true },
-  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon, active: true },
+  { name: 'Overview', href: '/overview', icon: TableCellsIcon, active: true },
   { name: 'Add', href: '/data-entry', icon: PlusIcon, active: true, isSpecial: true },
-  { name: 'Share', href: '/share', icon: ShareIcon, active: false },
-  { name: 'Girls', href: '/girls', icon: UsersIcon, active: true },
-  { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: false }
+  { name: 'Share', href: '/share', icon: ShareIcon, active: true },
+  { name: 'Analytics', href: '/analytics', icon: ChartBarIcon, active: true },
+  { name: 'Leaderboards', href: '/leaderboards', icon: TrophyIcon, active: true }
 ];
 
 export default function MobileNav() {
