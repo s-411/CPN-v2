@@ -7,11 +7,14 @@ import {
   PencilIcon, 
   TrashIcon,
   ChevronUpIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  TableCellsIcon
 } from '@heroicons/react/24/outline';
 import { useGirls, useDataEntries } from '@/lib/context';
 import { GirlWithMetrics, SortConfig } from '@/lib/types';
 import { formatCurrency, formatTime, formatRating, sortGirlsByField } from '@/lib/calculations';
+import EditGirlModal from '@/components/modals/EditGirlModal';
+import AddGirlModal from '@/components/modals/AddGirlModal';
 
 export default function OverviewPage() {
   const { girlsWithMetrics, deleteGirl } = useGirls();
@@ -21,6 +24,8 @@ export default function OverviewPage() {
     direction: 'asc'
   });
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [editingGirl, setEditingGirl] = useState<GirlWithMetrics | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleSort = (field: string) => {
     setSortConfig(prev => ({
@@ -69,16 +74,22 @@ export default function OverviewPage() {
       <div className="border-b border-cpn-gray/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-6">
-            <div>
-              <h1 className="text-3xl font-heading text-cpn-white">Overview</h1>
-              <p className="text-cpn-gray mt-1">
-                Comprehensive metrics for all your profiles
-              </p>
+            <div className="flex items-center gap-3">
+              <TableCellsIcon className="w-8 h-8 text-cpn-yellow" />
+              <div>
+                <h1 className="text-3xl font-heading text-cpn-white">Overview</h1>
+                <p className="text-cpn-gray mt-1">
+                  Comprehensive metrics for all your profiles
+                </p>
+              </div>
             </div>
-            <Link href="/girls" className="btn-cpn flex items-center gap-2">
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="btn-cpn flex items-center gap-2"
+            >
               <PlusIcon className="w-5 h-5" />
               Add New Girl
-            </Link>
+            </button>
           </div>
         </div>
       </div>
@@ -106,8 +117,8 @@ export default function OverviewPage() {
           </div>
         ) : (
           <div className="animate-fade-in">
-            {/* Desktop Table */}
-            <div className="hidden lg:block">
+            {/* Desktop & Tablet Table */}
+            <div className="hidden md:block">
               <div className="card-cpn overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="table-cpn">
@@ -137,6 +148,7 @@ export default function OverviewPage() {
                         <th>
                           <SortButton field="metrics.costPerHour">Cost per Hour</SortButton>
                         </th>
+                        <th>Nuts per Hour</th>
                         <th>Add Data</th>
                         <th>Actions</th>
                       </tr>
@@ -175,6 +187,9 @@ export default function OverviewPage() {
                           <td className="text-cpn-yellow font-medium">
                             {formatCurrency(girl.metrics.costPerHour)}
                           </td>
+                          <td className="font-medium">
+                            {girl.metrics.totalTime > 0 ? (girl.metrics.totalNuts / (girl.metrics.totalTime / 60)).toFixed(1) : '0'}
+                          </td>
                           <td>
                             <Link
                               href={`/girls/${girl.id}/add-data`}
@@ -187,7 +202,7 @@ export default function OverviewPage() {
                           <td>
                             <div className="flex items-center gap-2">
                               <button
-                                onClick={() => console.log('Edit:', girl)}
+                                onClick={() => setEditingGirl(girl)}
                                 className="text-cpn-gray hover:text-cpn-yellow transition-colors p-1"
                                 title="Edit girl"
                               >
@@ -214,78 +229,101 @@ export default function OverviewPage() {
               </div>
             </div>
 
-            {/* Mobile Cards */}
-            <div className="lg:hidden space-y-4">
+            {/* Mobile Cards - Enhanced UX */}
+            <div className="md:hidden space-y-3">
               {sortedGirls.map((girl) => (
-                <div key={girl.id} className="card-cpn">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-lg font-heading text-cpn-white">{girl.name}</h3>
-                      <p className="text-sm text-cpn-gray">{girl.age} • {girl.nationality}</p>
-                      <p className="text-sm text-cpn-yellow mt-1">{formatRating(girl.rating)}</p>
+                <div key={girl.id} className="card-cpn overflow-hidden">
+                  {/* Header with key info */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-base font-heading text-cpn-white">{girl.name}</h3>
+                        <span className="text-xs bg-cpn-yellow/20 text-cpn-yellow px-2 py-0.5 rounded-full">
+                          {formatRating(girl.rating)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-cpn-gray">{girl.age} • {girl.nationality}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/girls/${girl.id}/add-data`}
-                        className="btn-cpn text-sm px-3 py-1 flex items-center gap-1"
-                      >
-                        <PlusIcon className="w-4 h-4" />
-                        Add
-                      </Link>
-                      <button
-                        onClick={() => console.log('Edit:', girl)}
-                        className="text-cpn-gray hover:text-cpn-yellow transition-colors p-1"
-                      >
-                        <PencilIcon className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(girl.id)}
-                        className={`transition-colors p-1 ${
-                          deleteConfirm === girl.id
-                            ? 'text-red-400 hover:text-red-300'
-                            : 'text-cpn-gray hover:text-red-400'
-                        }`}
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-cpn-yellow">
+                        {formatCurrency(girl.metrics.costPerNut)}
+                      </p>
+                      <p className="text-xs text-cpn-gray">per nut</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <p className="text-cpn-gray">Total Nuts</p>
-                      <p className="font-medium text-cpn-white">{girl.metrics.totalNuts}</p>
+                  {/* Key metrics - 3 column grid on mobile */}
+                  <div className="grid grid-cols-3 gap-2 mb-4 text-xs">
+                    <div className="text-center p-2 bg-cpn-dark2/50 rounded">
+                      <p className="text-cpn-gray">Nuts</p>
+                      <p className="font-semibold text-cpn-white">{girl.metrics.totalNuts}</p>
                     </div>
-                    <div>
-                      <p className="text-cpn-gray">Total Spent</p>
-                      <p className="font-medium text-cpn-yellow">
-                        {formatCurrency(girl.metrics.totalSpent)}
-                      </p>
+                    <div className="text-center p-2 bg-cpn-dark2/50 rounded">
+                      <p className="text-cpn-gray">Spent</p>
+                      <p className="font-semibold text-cpn-yellow">{formatCurrency(girl.metrics.totalSpent)}</p>
                     </div>
-                    <div>
-                      <p className="text-cpn-gray">Cost/Nut</p>
-                      <p className="font-bold text-cpn-yellow">
-                        {formatCurrency(girl.metrics.costPerNut)}
-                      </p>
+                    <div className="text-center p-2 bg-cpn-dark2/50 rounded">
+                      <p className="text-cpn-gray">Time</p>
+                      <p className="font-semibold text-cpn-white">{formatTime(girl.metrics.totalTime)}</p>
                     </div>
-                    <div>
-                      <p className="text-cpn-gray">Total Time</p>
-                      <p className="font-medium text-cpn-white">
-                        {formatTime(girl.metrics.totalTime)}
-                      </p>
+                  </div>
+
+                  {/* Additional metrics - expandable */}
+                  <details className="group mb-3">
+                    <summary className="flex items-center justify-between cursor-pointer text-xs text-cpn-gray hover:text-cpn-white transition-colors">
+                      <span>More metrics</span>
+                      <span className="group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <p className="text-cpn-gray">Cost/Hour</p>
+                        <p className="font-medium text-cpn-yellow">{formatCurrency(girl.metrics.costPerHour)}</p>
+                      </div>
+                      <div>
+                        <p className="text-cpn-gray">Nuts/Hour</p>
+                        <p className="font-medium text-cpn-white">
+                          {girl.metrics.totalTime > 0 ? (girl.metrics.totalNuts / (girl.metrics.totalTime / 60)).toFixed(1) : '0'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-cpn-gray">Time/Nut</p>
+                        <p className="font-medium text-cpn-white">
+                          {girl.metrics.timePerNut > 0 ? `${Math.round(girl.metrics.timePerNut)}m` : '0m'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-cpn-gray">Entries</p>
+                        <p className="font-medium text-cpn-white">{girl.totalEntries}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-cpn-gray">Time/Nut</p>
-                      <p className="font-medium text-cpn-white">
-                        {girl.metrics.timePerNut > 0 ? `${Math.round(girl.metrics.timePerNut)}m` : '0m'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-cpn-gray">Cost/Hour</p>
-                      <p className="font-medium text-cpn-yellow">
-                        {formatCurrency(girl.metrics.costPerHour)}
-                      </p>
-                    </div>
+                  </details>
+
+                  {/* Action buttons - horizontal layout */}
+                  <div className="flex items-center gap-2 pt-3 border-t border-cpn-gray/10">
+                    <Link
+                      href={`/girls/${girl.id}/add-data`}
+                      className="flex-1 bg-cpn-yellow text-cpn-dark text-center py-2 px-3 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                    >
+                      + Add Data
+                    </Link>
+                    <button
+                      onClick={() => setEditingGirl(girl)}
+                      className="p-2 text-cpn-gray hover:text-cpn-yellow transition-colors rounded-lg hover:bg-cpn-dark2/50"
+                      title="Edit"
+                    >
+                      <PencilIcon className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteClick(girl.id)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        deleteConfirm === girl.id
+                          ? 'text-red-400 bg-red-500/10'
+                          : 'text-cpn-gray hover:text-red-400 hover:bg-red-500/10'
+                      }`}
+                      title={deleteConfirm === girl.id ? 'Confirm delete' : 'Delete'}
+                    >
+                      <TrashIcon className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))}
@@ -307,6 +345,21 @@ export default function OverviewPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Girl Modal */}
+      {editingGirl && (
+        <EditGirlModal
+          isOpen={!!editingGirl}
+          onClose={() => setEditingGirl(null)}
+          girl={editingGirl}
+        />
+      )}
+
+      {/* Add Girl Modal */}
+      <AddGirlModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 }

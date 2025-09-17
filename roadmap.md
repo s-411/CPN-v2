@@ -137,6 +137,71 @@ interface MockLeaderboardData {
   - Data backup creation
   - Account deletion options
 
+### 1.45 Overview Page Implementation
+
+#### Spreadsheet-Style Data Overview
+
+- Table View Interface:
+  - Comprehensive tabular display of all tracked profiles
+  - Sortable columns for all key metrics (name, rating, cost per nut, total spent, time, etc.)
+  - Real-time calculated metrics including nuts per hour and efficiency rankings
+  - Visual hierarchy with color coding for performance tiers
+
+#### Enhanced Mobile Experience
+
+- Responsive Design Strategy:
+  - Desktop/tablet: Full table with horizontal scroll capability
+  - Mobile: Card-based layout with expandable details section
+  - Progressive disclosure pattern to reduce cognitive load
+  - Touch-optimized action buttons and navigation
+
+#### Direct Action Integration
+
+- Row-Level Operations:
+  - Add Data: Direct navigation to data entry for specific profile
+  - Edit Profile: Modal-based editing with pre-populated forms
+  - Delete Profile: Confirmation system with impact warnings
+  - Bulk Operations: Multi-select capability for batch actions
+
+#### Advanced Sorting & Organization
+
+- Multi-Column Sorting:
+  - Primary and secondary sort options
+  - Visual sort indicators with directional arrows
+  - Persistent sort preferences across sessions
+  - Smart default sorting by efficiency metrics
+
+#### Performance Metrics Display
+
+```javascript
+interface OverviewMetrics {
+  // Core requested columns
+  name: string;
+  rating: number;
+  costPerNut: number;
+  totalSpent: number;
+  totalTime: number; // formatted display
+  costPerHour: number;
+  nutsPerHour: number; // new calculated metric
+  
+  // Additional valuable columns
+  totalNuts: number;
+  timePerNut: number; // average session efficiency
+  totalEntries: number;
+  efficiencyRank: number; // relative ranking
+  lastActivity: Date;
+  activityStatus: 'active' | 'idle' | 'inactive';
+}
+```
+
+#### Mobile UX Innovations
+
+- Expandable Card System:
+  - Header with key info (name, rating, cost per nut prominence)
+  - 3-column grid for primary metrics (nuts, spent, time)
+  - Collapsible "More metrics" section for additional data
+  - Prominent "Add Data" CTA with edit/delete icon actions
+
 ### 1.5 Billing & Subscription Implementation
 
 #### Subscription Tier Structure
@@ -192,6 +257,232 @@ interface MockLeaderboardData {
   - Who can see shared content
   - Temporary vs. permanent sharing
   - Revocation of shared links
+
+### 1.7 Onboarding Flow Implementation
+
+#### User Acquisition Funnel
+
+- **Entry Point Strategy**:
+  - TikTok/Instagram traffic → Landing page → "Start for Free" CTA
+  - Redirect to onboarding flow at `/onboarding/step-1`
+  - Completely separate from main app UI (one-time user experience)
+
+#### 5-Step Onboarding Journey
+
+- **Step 1: Add Girl Profile** (`/onboarding/step-1`)
+  - Minimal form: Name, Age, Hair Color (optional), Hotness Rating (tile-based 5.0-10.0)
+  - Clean page with no navigation elements
+  - "Add Expenses" CTA button (not generic "Continue")
+  - Session storage for data persistence
+
+- **Step 2: Add Expense Entry** (`/onboarding/step-2`)
+  - Date, Amount Spent, Time (hours/minutes), Number of Nuts
+  - Reuse existing data entry form patterns
+  - "Calculate CPN" CTA button
+  - Session storage integration
+
+- **Step 3: Email Collection & Account Creation** (`/onboarding/step-3`)
+  - Clerk authentication with 6-digit email verification code
+  - Higher conversion than magic links
+  - "Get your CPN result" messaging
+  - Account creation triggers data migration from session storage
+
+- **Step 4: CPN Results & Subscription Selection** (`/onboarding/results`)
+  - Prominent CPN display with calculated metrics
+  - Three subscription options:
+    - Player Mode: $1.99/week (premium features)
+    - Lifetime Access: $27 one-time (all features)
+    - Boyfriend Mode: Free (limited to 1 girl)
+  - Stripe integration for payment processing
+
+- **Step 5: Welcome & App Entry**
+  - Premium Welcome (`/onboarding/welcome-premium`): Payment success, feature highlights
+  - Free Welcome (`/onboarding/welcome-free`): Limitation explanation, upgrade CTAs
+  - Redirect to main dashboard with onboarding data already migrated
+
+#### Technical Architecture
+
+- **Session Management**:
+  - SessionStorage for onboarding data persistence
+  - Automatic migration to Supabase upon account creation
+  - Session cleanup after successful migration
+  - Recovery from browser refresh during flow
+
+- **Authentication Integration**:
+  - Clerk for email verification and account creation
+  - 6-digit verification code system
+  - Instant account creation upon verification
+  - Seamless redirect to results presentation
+
+- **Payment Processing**:
+  - Stripe subscription management
+  - Player Mode: $1.99/week recurring
+  - Lifetime Access: $27 one-time payment
+  - Webhook processing for payment confirmation
+
+- **Data Migration Strategy**:
+  - Onboarding data (girl + expense entry) stored in sessionStorage
+  - Upon account creation: migrate to user's Supabase profile
+  - Immediate CPN calculation and display
+  - Clear session storage after successful migration
+
+#### Paywall Implementation
+
+- **Free Tier Strategy ("Boyfriend Mode")**:
+  - Maximum 1 girl profile, 1 data entry per girl
+  - Full dashboard navigation (can click everywhere)
+  - Blur overlays on premium features with upgrade CTAs
+  - Strategic conversion-focused paywalls
+
+- **Premium Feature Gates**:
+  - Leaderboards: Paywall with competition messaging
+  - Analytics: Advanced insights behind paywall
+  - Data Vault: Community data requires upgrade
+  - Share Features: Social functionality paywalled
+
+#### Email Marketing Integration (ConvertKit)
+
+- **Tag-Based Email Automation**:
+  - "signed up - free" tag added on email verification
+  - "signed up - monthly" tag on Player Mode upgrade
+  - "signed up - lifetime" tag on Lifetime purchase
+
+
+#### Mobile-First Optimization
+
+- **TikTok/Instagram Traffic Focus**:
+  - Mobile-responsive design throughout flow
+  - Touch-friendly form inputs and CTAs
+  - Fast loading times and minimal JavaScript
+  - Smooth animations for engagement
+
+- **Conversion Optimization**:
+  - Social proof elements on payment pages
+  - Feature comparison tables
+  - Testimonials and success stories
+  - Urgency and scarcity messaging
+
+#### Success Metrics & KPIs
+
+- **Conversion Funnel Tracking**:
+  - Landing → Step 1: Entry rate
+  - Step 1 → Step 2: Girl form completion (target: 80%+)
+  - Step 2 → Step 3: Expense form completion (target: 75%+)
+  - Step 3 → Results: Email verification (target: 90%+)
+  - Results → Payment: Subscription conversion (target: 8%+)
+
+- **Email Recovery Performance**:
+  - Email delivery rates and open rates
+  - Click-through rates to upgrade pages
+  - Email-to-paid conversion rates
+  - Long-term user engagement via email
+
+### 1.8 Affiliate Integration with Rewardful
+
+#### Automatic Affiliate Activation
+
+- **Zero-Friction Affiliate Creation**:
+  - Every user automatically becomes an affiliate upon account creation
+  - No separate signup or approval process required
+  - Instant affiliate code and link generation via Rewardful API
+  - Automatic commission structure: 1 free week for successful referrals
+
+#### Built-in Affiliate Dashboard
+
+- **Native Affiliate Page** (`/affiliate`):
+  - Personal affiliate link with one-click copy functionality
+  - QR code generation for easy mobile sharing
+  - Real-time referral tracking and statistics
+  - Commission history and payout status
+  - Social sharing templates (Instagram story, TikTok bio, etc.)
+
+#### Viral Sharing Features
+
+- **Share Tools Integration**:
+  - Pre-built message templates for different platforms
+  - "Share with friends" CTA throughout the app experience
+  - Success story sharing with embedded affiliate links
+  - Achievement-based sharing triggers ("I just hit 100 nuts!")
+
+#### Rewardful API Integration
+
+- **Technical Implementation**:
+  - Automatic affiliate creation webhook upon user registration
+  - Real-time commission tracking via Rewardful API
+  - Payout automation (free week credits applied automatically)
+  - Attribution tracking for conversion optimization
+  - Fraud detection and duplicate signup prevention
+
+#### Referral Reward System
+
+- **Commission Structure**:
+  - Referrer: 1 free week of Player Mode per successful conversion
+  - Referee: Potential signup bonus or extended trial
+  - Lifetime customers: Higher commission rates for quality referrals
+  - Tiered rewards for high-performing affiliates (5+ referrals = bonus)
+
+#### Analytics & Performance Tracking
+
+- **Affiliate Performance Metrics**:
+  - Click-through rates on affiliate links
+  - Conversion rates by traffic source
+  - Top-performing affiliates and their strategies
+  - Revenue attribution and ROI analysis
+  - Geographic performance data for targeted campaigns
+
+#### User Experience Flow
+
+```javascript
+// Affiliate integration workflow
+const affiliateFlow = {
+  // 1. User signs up → Automatic affiliate creation
+  onUserRegistration: async (user) => {
+    const affiliate = await rewardful.createAffiliate({
+      email: user.email,
+      firstName: user.firstName,
+      autoApprove: true
+    });
+    
+    await updateUser(user.id, {
+      affiliateId: affiliate.id,
+      affiliateLink: affiliate.link
+    });
+  },
+  
+  // 2. User visits /affiliate → Display personal dashboard
+  affiliateDashboard: {
+    personalLink: user.affiliateLink,
+    qrCode: generateQR(user.affiliateLink),
+    stats: await rewardful.getAffiliateStats(user.affiliateId),
+    shareTemplates: generateShareContent(user.affiliateLink)
+  }
+};
+```
+
+#### Social Media Integration
+
+- **Platform-Specific Sharing**:
+  - Instagram: Story templates with swipe-up links
+  - TikTok: Bio link optimization and video templates
+  - Twitter: Tweet templates with affiliate links
+  - WhatsApp: Group sharing with personalized messages
+  - Discord: Server promotion tools and bot integration
+
+#### Gamification Elements
+
+- **Affiliate Leaderboards**:
+  - Monthly top referrer competitions
+  - Special badges for milestone achievements
+  - Exclusive features for high-performing affiliates
+  - Community recognition and social proof
+
+#### Compliance & Ethics
+
+- **Transparent Disclosure**:
+  - Clear affiliate relationship disclosure
+  - FTC compliance for all promotional content
+  - Terms and conditions for affiliate participation
+  - Anti-spam policies and enforcement
 
 ---
 

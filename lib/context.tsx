@@ -4,6 +4,7 @@ import React, { createContext, useContext, useReducer, useEffect, ReactNode } fr
 import { Girl, DataEntry, GirlWithMetrics, GlobalStats } from './types';
 import { girlsStorage, dataEntriesStorage } from './storage';
 import { createGirlWithMetrics, calculateGlobalStats } from './calculations';
+import { autoMigrateIfNeeded } from './migrations';
 
 interface AppState {
   girls: Girl[];
@@ -156,6 +157,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const loadData = () => {
       try {
+        // Run auto-migration for demographic fields before loading data
+        autoMigrateIfNeeded();
+        
         const girls = girlsStorage.getAll();
         const dataEntries = dataEntriesStorage.getAll();
         dispatch({ type: 'LOAD_DATA', payload: { girls, dataEntries } });
