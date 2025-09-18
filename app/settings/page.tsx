@@ -17,9 +17,15 @@ import {
   EyeSlashIcon,
   TrophyIcon,
   ChartBarIcon,
-  CreditCardIcon
+  CreditCardIcon,
+  TrashIcon,
+  ExclamationTriangleIcon,
+  UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { useGirls, useDataEntries } from '@/lib/context';
+import { leaderboardGroupsStorage, leaderboardMembersStorage } from '@/lib/leaderboards';
+import { LeaderboardGroup } from '@/lib/types';
+import Link from 'next/link';
 
 interface UserProfile {
   displayName: string;
@@ -108,6 +114,11 @@ export default function SettingsPage() {
     anonymousMode: false
   });
 
+  // Leaderboards state
+  const [userGroups, setUserGroups] = useState<LeaderboardGroup[]>([]);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [groupToLeave, setGroupToLeave] = useState<LeaderboardGroup | null>(null);
+
   // Load settings from localStorage
   useEffect(() => {
     setIsClient(true);
@@ -136,7 +147,17 @@ export default function SettingsPage() {
     if (savedPrivacy) {
       setPrivacySettings(JSON.parse(savedPrivacy));
     }
+
+    // Load user groups
+    loadUserGroups();
   }, []);
+
+  const loadUserGroups = () => {
+    // Get all groups - in a real app, this would filter by user membership
+    // For now, we'll show all groups as if the user is a member
+    const allGroups = leaderboardGroupsStorage.getAll();
+    setUserGroups(allGroups);
+  };
 
   // Save functions
   const saveProfile = (newProfile: UserProfile) => {
@@ -181,6 +202,29 @@ export default function SettingsPage() {
   const handleAvatarChange = (avatar: string) => {
     saveProfile({ ...profile, avatarUrl: avatar });
     setShowAvatarSelector(false);
+  };
+
+  // Leaderboard handlers
+  const handleLeaveGroup = (group: LeaderboardGroup) => {
+    setGroupToLeave(group);
+    setShowLeaveModal(true);
+  };
+
+  const confirmLeaveGroup = () => {
+    if (!groupToLeave) return;
+    
+    // In a real app, this would remove the user from the group
+    // For now, we'll just remove the group entirely for demo purposes
+    leaderboardGroupsStorage.delete(groupToLeave.id);
+    
+    loadUserGroups();
+    setShowLeaveModal(false);
+    setGroupToLeave(null);
+  };
+
+  const cancelLeaveGroup = () => {
+    setShowLeaveModal(false);
+    setGroupToLeave(null);
   };
 
   // Data export functions
@@ -266,7 +310,10 @@ export default function SettingsPage() {
 
             {/* Display Name */}
             <div className="mb-6">
-              <h3 className="text-lg font-medium text-cpn-white mb-4">Display Name</h3>
+              <h3 className="text-lg font-medium text-cpn-white mb-2">Display Name</h3>
+              <p className="text-xs text-cpn-gray/80 mb-4">
+                (This name will be visible only to groups that you have joined and will not be publicly available)
+              </p>
               <div className="flex items-center gap-4">
                 {isEditingProfile ? (
                   <div className="flex items-center gap-2 flex-1">
@@ -338,150 +385,80 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Privacy & Leaderboards */}
+          {/* Leaderboards */}
           <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
             <div className="flex items-center gap-3 mb-6">
-              <ShieldCheckIcon className="w-6 h-6 text-cpn-yellow" />
-              <h2 className="text-xl font-heading text-cpn-white">Privacy & Leaderboards</h2>
+              <TrophyIcon className="w-6 h-6 text-cpn-yellow" />
+              <h2 className="text-xl font-heading text-cpn-white">Leaderboards</h2>
             </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-cpn-dark2/30 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-cpn-white">Leaderboard Visibility</h4>
-                  <p className="text-sm text-cpn-gray">Show your profile in public leaderboards</p>
-                </div>
-                <button
-                  onClick={() => updatePrivacySettings({ leaderboardVisible: !privacySettings.leaderboardVisible })}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                    privacySettings.leaderboardVisible ? 'bg-green-500' : 'bg-cpn-gray'
-                  }`}
+            
+            {userGroups.length === 0 ? (
+              <div className="text-center py-8">
+                <UserGroupIcon className="w-12 h-12 text-cpn-gray mx-auto mb-4" />
+                <p className="text-cpn-gray mb-2">You haven't joined any groups yet</p>
+                <Link 
+                  href="/leaderboards"
+                  className="text-cpn-yellow hover:text-cpn-yellow/80 transition-colors text-sm"
                 >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      privacySettings.leaderboardVisible ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
+                  Browse leaderboards →
+                </Link>
               </div>
-
-              <div className="flex items-center justify-between p-4 bg-cpn-dark2/30 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-cpn-white">Share Statistics</h4>
-                  <p className="text-sm text-cpn-gray">Allow others to see your performance stats</p>
-                </div>
-                <button
-                  onClick={() => updatePrivacySettings({ shareStats: !privacySettings.shareStats })}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                    privacySettings.shareStats ? 'bg-green-500' : 'bg-cpn-gray'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      privacySettings.shareStats ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-cpn-dark2/30 rounded-lg">
-                <div>
-                  <h4 className="font-medium text-cpn-white">Anonymous Mode</h4>
-                  <p className="text-sm text-cpn-gray">Hide your display name in all public areas</p>
-                </div>
-                <button
-                  onClick={() => updatePrivacySettings({ anonymousMode: !privacySettings.anonymousMode })}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
-                    privacySettings.anonymousMode ? 'bg-green-500' : 'bg-cpn-gray'
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      privacySettings.anonymousMode ? 'translate-x-6' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Display Preferences */}
-          <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
-            <div className="flex items-center gap-3 mb-6">
-              <PaintBrushIcon className="w-6 h-6 text-cpn-yellow" />
-              <h2 className="text-xl font-heading text-cpn-white">Display Preferences</h2>
-            </div>
-
-            {/* Date Format */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-cpn-white mb-4">Date Format</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {dateFormatOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => updateDateTimeSettings({ dateFormat: option.value })}
-                    className={`p-3 rounded-lg border-2 transition-colors cursor-pointer ${
-                      dateTimeSettings.dateFormat === option.value
-                        ? 'border-cpn-yellow bg-cpn-yellow/10'
-                        : 'border-cpn-gray/20 hover:border-cpn-gray/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-cpn-white font-medium">{option.label}</span>
-                      <span className="text-cpn-gray text-sm">{option.example}</span>
+            ) : (
+              <div className="space-y-4">
+                {userGroups.map((group) => (
+                  <div key={group.id} className="flex items-center justify-between p-4 bg-cpn-dark2/50 rounded-lg border border-cpn-gray/20">
+                    <div className="flex items-center gap-4">
+                      <TrophyIcon className="w-6 h-6 text-cpn-yellow" />
+                      <div>
+                        <h3 className="text-cpn-white font-medium">{group.name}</h3>
+                        <div className="flex items-center gap-4 text-sm text-cpn-gray">
+                          <span>{group.memberCount} members</span>
+                          <span>•</span>
+                          <span>Joined {group.createdAt.toLocaleDateString()}</span>
+                        </div>
+                      </div>
                     </div>
-                  </button>
+                    
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={`/leaderboards/${group.id}`}
+                        className="px-3 py-2 text-cpn-yellow border border-cpn-yellow/30 rounded-lg hover:bg-cpn-yellow/10 transition-colors text-sm"
+                      >
+                        View Rankings
+                      </Link>
+                      <button
+                        onClick={() => handleLeaveGroup(group)}
+                        className="p-2 text-cpn-gray hover:text-red-400 transition-colors group"
+                        title="Leave group"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
+            )}
 
-            {/* Time Format */}
-            <div className="mb-6">
-              <h3 className="text-lg font-medium text-cpn-white mb-4">Time Format</h3>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => updateDateTimeSettings({ timeFormat: '12h' })}
-                  className={`p-3 rounded-lg border-2 transition-colors cursor-pointer ${
-                    dateTimeSettings.timeFormat === '12h'
-                      ? 'border-cpn-yellow bg-cpn-yellow/10'
-                      : 'border-cpn-gray/20 hover:border-cpn-gray/40'
-                  }`}
-                >
-                  <span className="text-cpn-white font-medium">12 Hour (AM/PM)</span>
-                </button>
-                <button
-                  onClick={() => updateDateTimeSettings({ timeFormat: '24h' })}
-                  className={`p-3 rounded-lg border-2 transition-colors cursor-pointer ${
-                    dateTimeSettings.timeFormat === '24h'
-                      ? 'border-cpn-yellow bg-cpn-yellow/10'
-                      : 'border-cpn-gray/20 hover:border-cpn-gray/40'
-                  }`}
-                >
-                  <span className="text-cpn-white font-medium">24 Hour</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Week Start */}
-            <div>
-              <h3 className="text-lg font-medium text-cpn-white mb-4">Week Starts On</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {weekStartOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => updateDateTimeSettings({ weekStart: option.value as 'sunday' | 'monday' })}
-                    className={`p-3 rounded-lg border-2 transition-colors cursor-pointer ${
-                      dateTimeSettings.weekStart === option.value
-                        ? 'border-cpn-yellow bg-cpn-yellow/10'
-                        : 'border-cpn-gray/20 hover:border-cpn-gray/40'
-                    }`}
-                  >
-                    <span className="text-cpn-white font-medium">{option.label}</span>
-                  </button>
-                ))}
+            {/* Privacy Notice */}
+            <div className="mt-6 bg-cpn-dark2/30 rounded-lg p-4">
+              <h3 className="text-lg font-medium text-cpn-white mb-3">Privacy & Anonymity</h3>
+              <div className="space-y-2 text-sm text-cpn-gray">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cpn-yellow rounded-full mt-2"></div>
+                  <p>All leaderboards are completely private and invite-only</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cpn-yellow rounded-full mt-2"></div>
+                  <p>Your display name is only visible to groups you've joined</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 bg-cpn-yellow rounded-full mt-2"></div>
+                  <p>All usernames are kept anonymous - only you know your real identity</p>
+                </div>
               </div>
             </div>
           </div>
+
 
           {/* Notifications */}
           <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
@@ -734,6 +711,45 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Leave Group Confirmation Modal */}
+      {showLeaveModal && groupToLeave && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-cpn-dark border border-cpn-gray/20 rounded-lg w-full max-w-md animate-slide-up">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-red-500/20 rounded-full flex items-center justify-center">
+                  <ExclamationTriangleIcon className="w-6 h-6 text-red-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-heading text-cpn-white">Leave Group</h3>
+                  <p className="text-sm text-cpn-gray">This action cannot be undone</p>
+                </div>
+              </div>
+              
+              <p className="text-cpn-gray mb-6">
+                Are you sure you want to leave <strong className="text-cpn-white">"{groupToLeave.name}"</strong>? 
+                You'll need to be invited again to rejoin this group.
+              </p>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelLeaveGroup}
+                  className="flex-1 py-3 px-4 text-cpn-gray border border-cpn-gray/30 rounded-lg hover:text-cpn-white hover:border-cpn-gray transition-all duration-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmLeaveGroup}
+                  className="flex-1 py-3 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200"
+                >
+                  Yes, remove me from this group
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

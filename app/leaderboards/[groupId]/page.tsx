@@ -116,7 +116,7 @@ export default function GroupDashboardPage({ params }: GroupDashboardPageProps) 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left Column - Group Info */}
           <div className="lg:w-1/3">
-            <div className="card-cpn">
+            <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
               <div className="flex items-center gap-3 mb-6">
                 <TrophyIcon className="w-8 h-8 text-cpn-yellow" />
                 <div>
@@ -165,8 +165,8 @@ export default function GroupDashboardPage({ params }: GroupDashboardPageProps) 
                   </p>
                 </div>
 
-                {/* Mock data helper */}
-                <div className="border-t border-cpn-gray/20 pt-4">
+                {/* Mock data helper - Hidden but functionality preserved */}
+                <div className="border-t border-cpn-gray/20 pt-4 hidden">
                   <button
                     onClick={addMockMember}
                     className="w-full py-2 px-4 text-cpn-gray border border-cpn-gray/30 rounded-lg hover:text-cpn-white hover:border-cpn-gray transition-all duration-200 text-sm"
@@ -181,7 +181,7 @@ export default function GroupDashboardPage({ params }: GroupDashboardPageProps) 
 
           {/* Right Column - Rankings Table */}
           <div className="lg:w-2/3">
-            <div className="card-cpn">
+            <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
               <h2 className="text-xl font-heading text-cpn-white mb-6">Rankings</h2>
               
               {rankings.length === 0 ? (
@@ -264,7 +264,7 @@ export default function GroupDashboardPage({ params }: GroupDashboardPageProps) 
             </div>
 
             {/* Ranking Legend */}
-            <div className="mt-6 card-cpn">
+            <div className="mt-6 card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
               <h3 className="text-lg font-heading text-cpn-white mb-4">How Rankings Work</h3>
               <div className="grid md:grid-cols-2 gap-4 text-sm">
                 <div>

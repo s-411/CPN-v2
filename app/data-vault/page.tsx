@@ -28,68 +28,39 @@ export default function DataVaultPage() {
     ratingRange: 'All',
     location: 'All'
   });
-  const [mockGlobalStats, setMockGlobalStats] = useState<DemographicStats | null>(null);
+  const [globalStats, setGlobalStats] = useState<DemographicStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate loading global demographic statistics
-    const loadMockGlobalStats = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const stats: DemographicStats = {
-        ethnicity: {
-          Asian: { averageCostPerNut: 8.50, averageRating: 7.2, totalSpending: 125000, userCount: 450 },
-          Black: { averageCostPerNut: 7.20, averageRating: 7.8, totalSpending: 98000, userCount: 380 },
-          Latina: { averageCostPerNut: 9.80, averageRating: 7.5, totalSpending: 156000, userCount: 520 },
-          White: { averageCostPerNut: 11.20, averageRating: 6.9, totalSpending: 234000, userCount: 780 },
-          'Middle Eastern': { averageCostPerNut: 10.50, averageRating: 7.1, totalSpending: 67000, userCount: 220 },
-          Indian: { averageCostPerNut: 6.80, averageRating: 7.4, totalSpending: 45000, userCount: 180 },
-          Mixed: { averageCostPerNut: 8.90, averageRating: 7.6, totalSpending: 78000, userCount: 290 },
-          'Native American': { averageCostPerNut: 9.20, averageRating: 7.0, totalSpending: 23000, userCount: 95 },
-          'Pacific Islander': { averageCostPerNut: 8.70, averageRating: 7.3, totalSpending: 18000, userCount: 65 },
-          Other: { averageCostPerNut: 8.10, averageRating: 7.2, totalSpending: 34000, userCount: 150 }
-        },
-        hairColor: {
-          Blonde: { averageCostPerNut: 12.50, averageRating: 7.8, totalSpending: 298000, userCount: 670 },
-          Brunette: { averageCostPerNut: 8.20, averageRating: 7.2, totalSpending: 245000, userCount: 890 },
-          Black: { averageCostPerNut: 7.60, averageRating: 7.4, totalSpending: 189000, userCount: 720 },
-          Red: { averageCostPerNut: 10.80, averageRating: 7.6, totalSpending: 87000, userCount: 230 },
-          Auburn: { averageCostPerNut: 9.40, averageRating: 7.3, totalSpending: 56000, userCount: 180 },
-          'Gray/Silver': { averageCostPerNut: 13.20, averageRating: 6.8, totalSpending: 67000, userCount: 150 },
-          'Dyed/Colorful': { averageCostPerNut: 11.90, averageRating: 7.9, totalSpending: 78000, userCount: 210 },
-          Other: { averageCostPerNut: 8.50, averageRating: 7.1, totalSpending: 45000, userCount: 190 }
-        },
-        ratingTiers: {
-          '5.0-6.0': { averageCostPerNut: 6.20, totalSpending: 78000, popularityPercentage: 12 },
-          '6.0-7.0': { averageCostPerNut: 8.40, totalSpending: 234000, popularityPercentage: 35 },
-          '7.0-8.0': { averageCostPerNut: 10.60, totalSpending: 345000, popularityPercentage: 28 },
-          '8.0-9.0': { averageCostPerNut: 14.20, totalSpending: 289000, popularityPercentage: 18 },
-          '9.0-10.0': { averageCostPerNut: 18.90, totalSpending: 156000, popularityPercentage: 7 }
-        },
-        locations: {
-          'United States': { averageCostPerNut: 11.20, popularity: 45 },
-          'Canada': { averageCostPerNut: 10.80, popularity: 12 },
-          'United Kingdom': { averageCostPerNut: 13.50, popularity: 8 },
-          'Australia': { averageCostPerNut: 12.90, popularity: 6 },
-          'Germany': { averageCostPerNut: 9.70, popularity: 5 },
-          'France': { averageCostPerNut: 14.20, popularity: 4 },
-          'Japan': { averageCostPerNut: 8.60, popularity: 7 },
-          'Brazil': { averageCostPerNut: 7.80, popularity: 3 },
-          'Other': { averageCostPerNut: 9.50, popularity: 10 }
+    // Fetch global demographic statistics from API
+    const loadGlobalStats = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/global-stats');
+        if (!response.ok) {
+          throw new Error('Failed to fetch global statistics');
         }
-      };
-      
-      setMockGlobalStats(stats);
-      setIsLoading(false);
+        
+        const stats: DemographicStats = await response.json();
+        setGlobalStats(stats);
+      } catch (err) {
+        console.error('Error loading global stats:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error occurred');
+      } finally {
+        setIsLoading(false);
+      }
     };
 
-    loadMockGlobalStats();
+    loadGlobalStats();
   }, []);
 
   const getFilteredData = () => {
-    if (!mockGlobalStats) return null;
+    if (!globalStats) return null;
 
-    let data = mockGlobalStats;
+    let data = globalStats;
     
     // Apply filters to get relevant subset of data
     if (filters.ethnicity !== 'All') {
@@ -174,6 +145,26 @@ export default function DataVaultPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-cpn-dark flex items-center justify-center">
+        <div className="animate-fade-in text-center max-w-md mx-auto px-4">
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
+            <span className="text-red-400 text-2xl">⚠️</span>
+          </div>
+          <h2 className="text-xl font-heading text-cpn-white mb-2">Unable to Load Data</h2>
+          <p className="text-cpn-gray mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn-cpn"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-cpn-dark">
       {/* Header */}
@@ -184,9 +175,19 @@ export default function DataVaultPage() {
               <div className="flex items-center gap-3">
                 <GlobeAltIcon className="w-8 h-8 text-cpn-yellow" />
                 <div>
-                  <h1 className="text-3xl font-heading text-cpn-white">Data Vault</h1>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-3xl font-heading text-cpn-white">Data Vault</h1>
+                    <span className="px-3 py-1 bg-cpn-yellow/20 text-cpn-yellow border border-cpn-yellow/30 rounded-full text-sm font-medium">
+                      Beta Launch
+                    </span>
+                  </div>
                   <p className="text-cpn-gray mt-1">
                     Global insights and demographic trends from {filteredData?.totalUsers.toLocaleString()} anonymous users
+                    {filteredData?.totalUsers === 0 && (
+                      <span className="block text-sm mt-1 text-cpn-yellow/80">
+                        🚀 Data will grow as users join the platform
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -205,7 +206,7 @@ export default function DataVaultPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-fade-in space-y-8">
           {/* Filters Section */}
-          <div className="card-cpn">
+          <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark">
             <div className="flex items-center gap-3 mb-6">
               <FunnelIcon className="w-6 h-6 text-cpn-yellow" />
               <h2 className="text-xl font-heading text-cpn-white">Demographic Filters</h2>
@@ -395,32 +396,32 @@ export default function DataVaultPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {userInsights.favoriteEthnicity && mockGlobalStats && (
+                {userInsights.favoriteEthnicity && globalStats && (
                   <div className="bg-cpn-dark2/50 rounded-lg p-4">
                     <h4 className="text-cpn-yellow font-medium mb-2">Ethnicity Preference</h4>
                     <p className="text-cpn-white mb-1">
                       Your favorite: <span className="text-cpn-yellow">{userInsights.favoriteEthnicity}</span>
                     </p>
                     <p className="text-sm text-cpn-gray">
-                      Global avg cost: {formatCurrency(mockGlobalStats.ethnicity[userInsights.favoriteEthnicity].averageCostPerNut)}
+                      Global avg cost: {formatCurrency(globalStats.ethnicity[userInsights.favoriteEthnicity].averageCostPerNut)}
                     </p>
                     <p className="text-xs text-cpn-gray mt-2">
-                      {mockGlobalStats.ethnicity[userInsights.favoriteEthnicity].userCount.toLocaleString()} users globally
+                      {globalStats.ethnicity[userInsights.favoriteEthnicity].userCount.toLocaleString()} users globally
                     </p>
                   </div>
                 )}
 
-                {userInsights.favoriteHairColor && mockGlobalStats && (
+                {userInsights.favoriteHairColor && globalStats && (
                   <div className="bg-cpn-dark2/50 rounded-lg p-4">
                     <h4 className="text-cpn-yellow font-medium mb-2">Hair Color Preference</h4>
                     <p className="text-cpn-white mb-1">
                       Your favorite: <span className="text-cpn-yellow">{userInsights.favoriteHairColor}</span>
                     </p>
                     <p className="text-sm text-cpn-gray">
-                      Global avg cost: {formatCurrency(mockGlobalStats.hairColor[userInsights.favoriteHairColor].averageCostPerNut)}
+                      Global avg cost: {formatCurrency(globalStats.hairColor[userInsights.favoriteHairColor].averageCostPerNut)}
                     </p>
                     <p className="text-xs text-cpn-gray mt-2">
-                      {mockGlobalStats.hairColor[userInsights.favoriteHairColor].userCount.toLocaleString()} users globally
+                      {globalStats.hairColor[userInsights.favoriteHairColor].userCount.toLocaleString()} users globally
                     </p>
                   </div>
                 )}
@@ -444,8 +445,8 @@ export default function DataVaultPage() {
             </div>
           )}
 
-          {/* Discovery Insights */}
-          {mockGlobalStats && (
+          {/* Discovery Insights - Hidden until we have meaningful data */}
+          {globalStats && filteredData && filteredData.totalUsers > 10 && (
             <div className="card-cpn">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-6 h-6 flex items-center justify-center">
@@ -454,42 +455,10 @@ export default function DataVaultPage() {
                 <h2 className="text-xl font-heading text-cpn-white">Discovery Insights</h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-4 bg-gradient-to-r from-cpn-yellow/10 to-transparent rounded-lg border border-cpn-yellow/20">
-                  <p className="text-sm text-cpn-white">
-                    💸 <strong>Most Expensive:</strong> Blonde girls cost {formatCurrency(mockGlobalStats.hairColor.Blonde.averageCostPerNut)} per nut on average
-                  </p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-green-500/10 to-transparent rounded-lg border border-green-500/20">
-                  <p className="text-sm text-cpn-white">
-                    💰 <strong>Best Value:</strong> Indian girls cost only {formatCurrency(mockGlobalStats.ethnicity.Indian.averageCostPerNut)} per nut
-                  </p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-purple-500/10 to-transparent rounded-lg border border-purple-500/20">
-                  <p className="text-sm text-cpn-white">
-                    ⭐ <strong>Highest Rated:</strong> Black girls have the highest average rating at {mockGlobalStats.ethnicity.Black.averageRating.toFixed(1)} stars
-                  </p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-blue-500/10 to-transparent rounded-lg border border-blue-500/20">
-                  <p className="text-sm text-cpn-white">
-                    👑 <strong>Premium Tier:</strong> Girls rated 9.0-10.0 cost {formatCurrency(mockGlobalStats.ratingTiers['9.0-10.0'].averageCostPerNut)} per nut
-                  </p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-orange-500/10 to-transparent rounded-lg border border-orange-500/20">
-                  <p className="text-sm text-cpn-white">
-                    🌍 <strong>Most Expensive Region:</strong> French girls cost {formatCurrency(mockGlobalStats.locations.France.averageCostPerNut)} per nut
-                  </p>
-                </div>
-
-                <div className="p-4 bg-gradient-to-r from-red-500/10 to-transparent rounded-lg border border-red-500/20">
-                  <p className="text-sm text-cpn-white">
-                    🔥 <strong>Popular Choice:</strong> {mockGlobalStats.ratingTiers['6.0-7.0'].popularityPercentage}% of users date girls in the 6.0-7.0 range
-                  </p>
-                </div>
+              <div className="p-4 bg-gradient-to-r from-cpn-yellow/10 to-transparent rounded-lg border border-cpn-yellow/20">
+                <p className="text-sm text-cpn-white">
+                  🚀 <strong>Early Launch:</strong> More insights will appear as our user base grows beyond 10 users
+                </p>
               </div>
             </div>
           )}
