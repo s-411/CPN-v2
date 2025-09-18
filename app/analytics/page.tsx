@@ -53,7 +53,11 @@ export default function AnalyticsPage() {
   const monthlyTrends = getMonthlyTrends(filteredEntries);
 
   // Get active girls with data
-  const activeGirls = girlsWithMetrics.filter(girl => girl.totalEntries > 0);
+  const activeGirls = girlsWithMetrics.filter(girl => girl.totalEntries > 0 && (girl.isActive ?? true));
+  
+  // Debug logging
+  console.log('All girls with metrics:', girlsWithMetrics.map(g => ({ name: g.name, isActive: g.isActive, totalEntries: g.totalEntries })));
+  console.log('Filtered active girls:', activeGirls.map(g => ({ name: g.name, isActive: g.isActive, totalEntries: g.totalEntries })));
 
   // Get consistent colors for all girls
   const girlColorMap = getGirlColors(activeGirls.map(girl => girl.id));

@@ -86,21 +86,21 @@ export default function LeaderboardsPage() {
 
             {/* Benefits */}
             <div className="grid md:grid-cols-3 gap-6 mb-12">
-              <div className="card-cpn text-center">
+              <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark text-center">
                 <UserGroupIcon className="w-12 h-12 text-cpn-yellow mx-auto mb-4" />
                 <h3 className="text-lg font-heading text-cpn-white mb-2">Private Groups</h3>
                 <p className="text-cpn-gray text-sm">
                   Only invited members can see your group. Complete privacy guaranteed.
                 </p>
               </div>
-              <div className="card-cpn text-center">
+              <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark text-center">
                 <EyeIcon className="w-12 h-12 text-cpn-yellow mx-auto mb-4" />
                 <h3 className="text-lg font-heading text-cpn-white mb-2">Anonymous</h3>
                 <p className="text-cpn-gray text-sm">
                   All usernames are kept anonymous. Only you know your real identity.
                 </p>
               </div>
-              <div className="card-cpn text-center">
+              <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark text-center">
                 <TrophyIcon className="w-12 h-12 text-cpn-yellow mx-auto mb-4" />
                 <h3 className="text-lg font-heading text-cpn-white mb-2">Competitive</h3>
                 <p className="text-cpn-gray text-sm">
@@ -198,7 +198,7 @@ export default function LeaderboardsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
           {groups.map((group) => (
-            <div key={group.id} className="card-cpn hover:border-cpn-yellow/30 transition-all duration-200">
+            <div key={group.id} className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark hover:border-cpn-yellow/30 transition-all duration-200">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-xl font-heading text-cpn-white mb-1">{group.name}</h3>

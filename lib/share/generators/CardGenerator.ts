@@ -40,6 +40,17 @@ export class CardGenerator {
       padding: 40,
       cornerRadius: 24
     },
+    instagramStory: {
+      width: 1080,
+      height: 1920,
+      theme: 'dark',
+      accentColor: '#f2f661', // CPN yellow
+      backgroundColor: '#1f1f1f', // CPN dark
+      textColor: '#ffffff',
+      secondaryTextColor: '#ababab',
+      padding: 80,
+      cornerRadius: 32
+    },
     light: {
       width: 800,
       height: 600,
@@ -140,6 +151,13 @@ export class CardGenerator {
   }
 
   /**
+   * Generate an Instagram Story sized card for custom metrics
+   */
+  static async generateInstagramStoryCard(data: CardData): Promise<Blob> {
+    return this.generateCard(data, 'instagramStory');
+  }
+
+  /**
    * Generate a comparison report card
    */
   static async generateComparisonCard(comparison: any): Promise<Blob> {
@@ -209,37 +227,57 @@ export class CardGenerator {
   ): Promise<void> {
     const { padding } = config;
     let yOffset = padding;
+    const isInstagramStory = config.width === 1080 && config.height === 1920;
 
+    // Adjust font sizes for Instagram Story format
+    const titleFontSize = isInstagramStory ? 72 : 48;
+    const subtitleFontSize = isInstagramStory ? 36 : 24;
+    
     // Draw title
     ctx.fillStyle = config.accentColor;
-    ctx.font = 'bold 48px National2Condensed, Arial Black, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(data.title, padding, yOffset + 48);
-    yOffset += 80;
+    ctx.font = `bold ${titleFontSize}px National2Condensed, Arial Black, sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(data.title, config.width / 2, yOffset + titleFontSize);
+    yOffset += isInstagramStory ? 120 : 80;
 
     // Draw subtitle if present
     if (data.subtitle) {
       ctx.fillStyle = config.secondaryTextColor;
-      ctx.font = '24px ESKlarheit, Inter, sans-serif';
-      ctx.fillText(data.subtitle, padding, yOffset + 24);
-      yOffset += 60;
+      ctx.font = `${subtitleFontSize}px ESKlarheit, Inter, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(data.subtitle, config.width / 2, yOffset + subtitleFontSize);
+      yOffset += isInstagramStory ? 100 : 60;
     }
 
-    // Draw metrics in a grid
-    const metricsPerRow = 2;
-    const metricWidth = (config.width - padding * 2 - 30) / metricsPerRow;
-    const metricHeight = 100;
-    const startY = yOffset + 40;
+    // Draw metrics - optimize layout for Instagram Story (vertical)
+    if (isInstagramStory) {
+      // For Instagram Story: single column with larger boxes
+      const metricWidth = config.width - padding * 2;
+      const metricHeight = 180;
+      const startY = yOffset + 60;
+      const spacing = 40;
 
-    data.metrics.forEach((metric, index) => {
-      const row = Math.floor(index / metricsPerRow);
-      const col = index % metricsPerRow;
-      
-      const x = padding + (col * (metricWidth + 30));
-      const y = startY + (row * (metricHeight + 20));
+      data.metrics.forEach((metric, index) => {
+        const y = startY + (index * (metricHeight + spacing));
+        this.drawMetricBox(ctx, config, metric, padding, y, metricWidth, metricHeight);
+      });
+    } else {
+      // For regular cards: 2-column grid
+      const metricsPerRow = 2;
+      const metricWidth = (config.width - padding * 2 - 30) / metricsPerRow;
+      const metricHeight = 100;
+      const startY = yOffset + 40;
 
-      this.drawMetricBox(ctx, config, metric, x, y, metricWidth, metricHeight);
-    });
+      data.metrics.forEach((metric, index) => {
+        const row = Math.floor(index / metricsPerRow);
+        const col = index % metricsPerRow;
+        
+        const x = padding + (col * (metricWidth + 30));
+        const y = startY + (row * (metricHeight + 20));
+
+        this.drawMetricBox(ctx, config, metric, x, y, metricWidth, metricHeight);
+      });
+    }
   }
 
   private static drawMetricBox(
@@ -251,28 +289,39 @@ export class CardGenerator {
     width: number,
     height: number
   ): void {
+    const isInstagramStory = config.width === 1080 && config.height === 1920;
+    const cornerRadius = isInstagramStory ? 20 : 12;
+    const padding = isInstagramStory ? 32 : 16;
+    const labelFontSize = isInstagramStory ? 28 : 16;
+    const valueFontSize = isInstagramStory ? 48 : 28;
+    const labelYOffset = isInstagramStory ? 50 : 30;
+    const valueYOffset = isInstagramStory ? 110 : 65;
+
     // Draw metric background
     ctx.fillStyle = metric.highlight ? config.accentColor + '15' : '#2a2a2a';
-    this.drawRoundedRect(ctx, x, y, width, height, 12);
+    this.drawRoundedRect(ctx, x, y, width, height, cornerRadius);
     ctx.fill();
 
     // Draw metric border for highlighted items
     if (metric.highlight) {
       ctx.strokeStyle = config.accentColor + '60';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = isInstagramStory ? 3 : 2;
       ctx.stroke();
     }
 
     // Draw metric label
     ctx.fillStyle = config.secondaryTextColor;
-    ctx.font = '16px ESKlarheit, Inter, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText(metric.label, x + 16, y + 30);
+    ctx.font = `${labelFontSize}px ESKlarheit, Inter, sans-serif`;
+    ctx.textAlign = isInstagramStory ? 'center' : 'left';
+    const labelX = isInstagramStory ? x + width / 2 : x + padding;
+    ctx.fillText(metric.label, labelX, y + labelYOffset);
 
     // Draw metric value
     ctx.fillStyle = metric.highlight ? config.accentColor : config.textColor;
-    ctx.font = 'bold 28px National2Condensed, Arial Black, sans-serif';
-    ctx.fillText(metric.value, x + 16, y + 65);
+    ctx.font = `bold ${valueFontSize}px National2Condensed, Arial Black, sans-serif`;
+    ctx.textAlign = isInstagramStory ? 'center' : 'left';
+    const valueX = isInstagramStory ? x + width / 2 : x + padding;
+    ctx.fillText(metric.value, valueX, y + valueYOffset);
   }
 
   private static drawWatermark(

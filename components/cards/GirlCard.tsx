@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PencilIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { GirlWithMetrics } from '@/lib/types';
 import { formatCurrency, formatTime, formatRating } from '@/lib/calculations';
+import { useGirls } from '@/lib/context';
 
 interface GirlCardProps {
   girl: GirlWithMetrics;
@@ -13,6 +14,11 @@ interface GirlCardProps {
 
 export default function GirlCard({ girl, onEdit }: GirlCardProps) {
   const hasData = girl.totalEntries > 0;
+  const { updateGirl } = useGirls();
+
+  const toggleStatus = () => {
+    updateGirl(girl.id, { isActive: !girl.isActive });
+  };
 
   return (
     <div className="card-cpn bg-gradient-to-br from-cpn-dark2 to-cpn-dark hover:border-cpn-yellow/30 transition-all duration-200 group">
@@ -30,13 +36,30 @@ export default function GirlCard({ girl, onEdit }: GirlCardProps) {
             </span>
           </div>
         </div>
-        <button
-          onClick={() => onEdit(girl)}
-          className="text-cpn-gray hover:text-cpn-white transition-colors p-1 cursor-pointer"
-          title="Edit profile"
-        >
-          <PencilIcon className="w-5 h-5" />
-        </button>
+        <div className="flex flex-col items-center gap-2">
+          <button
+            onClick={() => onEdit(girl)}
+            className="text-cpn-gray hover:text-cpn-white transition-colors p-1 cursor-pointer"
+            title="Edit profile"
+          >
+            <PencilIcon className="w-5 h-5" />
+          </button>
+          
+          {/* Active/Inactive Toggle */}
+          <button
+            onClick={toggleStatus}
+            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${
+              girl.isActive ? 'bg-green-500' : 'bg-cpn-gray'
+            }`}
+            title={girl.isActive ? 'Active - Click to deactivate' : 'Inactive - Click to activate'}
+          >
+            <span
+              className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                girl.isActive ? 'translate-x-5' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       {hasData ? (

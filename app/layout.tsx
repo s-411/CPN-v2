@@ -9,6 +9,13 @@ import ShareModalWrapper from '@/components/sharing/ShareModalWrapper'
 export const metadata: Metadata = {
   title: 'CPN v2 - Cost Per Nut Calculator',
   description: 'Personal relationship metrics tracking application',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
+    apple: '/favicon.png',
+  },
 }
 
 export default function RootLayout({
@@ -17,8 +24,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="bg-cpn-dark text-cpn-white min-h-screen">
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-cpn-dark text-cpn-white min-h-screen" suppressHydrationWarning>
         <AppProvider>
           <ShareProvider>
             <div className="flex h-screen">
